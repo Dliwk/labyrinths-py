@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "labyrinths-py"
+description = "Mazes generation, auto-solving and online play"
+dynamic = ["version"]
+
+requires-python = ">= 3.12"
+dependencies = [
+
+]
+
+authors = [
+    { name = "Roman Trapeznikov", email = "trapeznikov.rd@phystech.edu" },
+]
+readme = "README.md"
+license = { file = "LICENSE" }
+
