@@ -4,14 +4,21 @@ from typing import Any
 import enum
 
 
-def load_from_dict[T](cls: type[T], data: dict | Any) -> T:
+def load_from_dict[T](cls: type[T], data: dict | list | Any) -> T:
+    annotations = cls.__annotations__ if hasattr(cls, '__annotations__') else cls
+    cls = cls.__origin__ if hasattr(cls, '__origin__') else cls
+
     if dataclasses.is_dataclass(cls):
         kwargs = {}
-        for name, annotation in cls.__annotations__.items():
+        for name, annotation in annotations.items():
             kwargs[name] = load_from_dict(annotation, data[name])
         return cls(**kwargs)
     elif issubclass(cls, enum.Enum):
         return cls(data)
+    elif issubclass(cls, list):
+        return [load_from_dict(annotations.__args__[0], i) for i in data]
+    elif issubclass(cls, dict):
+        return {key: load_from_dict(annotations.__args__[1], value) for key, value in data.items()}
     else:
         return cls(data)
 
@@ -24,6 +31,10 @@ def dump_to_dict(obj: Any) -> dict | Any:
         return result
     elif isinstance(obj, enum.Enum):
         return obj.value
+    elif isinstance(obj, list):
+        return [dump_to_dict(i) for i in obj]
+    elif isinstance(obj, dict):
+        return {key: dump_to_dict(value) for key, value in obj.items()}
     else:
         return obj
 
