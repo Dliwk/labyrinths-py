@@ -26,5 +26,5 @@ class DepthFirstSearchGenerator(LabyrinthGenerator):
     def generate(self) -> LabyrinthData:
         self.current = self.get_filled_maze(self.columns, self.rows)
         self.visited = [[False for _ in range(self.rows)] for _ in range(self.columns)]
-        self.visit(self.columns // 2, self.rows // 2)
+        self.visit(0, 0)
         return self.current

@@ -7,6 +7,7 @@ from pygame import draw
 
 from labyrinths.generators.dfs import DepthFirstSearchGenerator
 from labyrinths.labyrinth import LabyrinthData, WallKind
+from labyrinths.mazeloader import dump_maze
 
 pygame.init()
 pygame.font.init()
@@ -32,7 +33,11 @@ class Visualizer:
 
         self.font = pygame.font.Font(None, self.cellheight)
 
+        self.current_maze: LabyrinthData | None = None
+
     def draw_maze(self, maze: LabyrinthData) -> None:
+        self.current_maze = maze
+
         for i in range(maze.columns):
             for j in range(maze.rows):
                 x, y = i * self.cellwidth, (maze.rows - j - 1) * self.cellheight
@@ -73,24 +78,32 @@ class Visualizer:
                         0,
                     )
 
-    def new_maze(self):
+    def new_maze(self) -> None:
         generator = DepthFirstSearchGenerator(self.columns, self.rows)
         algoname = 'Depth First Search'
 
         maze = generator.generate()
         self.draw_maze(maze)
 
+        self.set_algoname(algoname)
+
+    def set_algoname(self, algoname: str) -> None:
         draw.rect(self.globalscreen, 'white',
                   pygame.Rect(0, self.globalheight - self.cellheight, self.globalwidth, self.cellheight))
         text = self.font.render(algoname, True, 'black')
         self.globalscreen.blit(text, (0, self.globalheight - self.cellheight))
 
-    def run(self):
+    def run(self, maze: LabyrinthData | None = None):
         pygame.display.set_caption('Labyrinths')
 
-        text = self.font.render('Mouse click to generate a maze!', True, 'black')
+        text = self.font.render('Mouse click to generate a maze! Press space to save to file', True, 'black')
         self.globalscreen.blit(text, (0, 0))
-        self.new_maze()
+
+        if maze is not None:
+            self.draw_maze(maze)
+            self.set_algoname('Loaded from file')
+        else:
+            self.new_maze()
 
         while True:
             for event in pygame.event.get():
@@ -100,5 +113,8 @@ class Visualizer:
                         sys.exit()
                     case pygame.MOUSEBUTTONDOWN:
                         self.new_maze()
+                    case pygame.KEYDOWN:
+                        if event.key == pygame.K_SPACE:
+                            dump_maze(self.current_maze, 'maze.json.gz')
 
                 pygame.display.flip()
