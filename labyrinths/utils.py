@@ -5,8 +5,8 @@ import enum
 
 
 def load_from_dict[T](cls: type[T], data: dict | list | Any) -> T:
-    annotations = cls.__annotations__ if hasattr(cls, '__annotations__') else cls
-    cls = cls.__origin__ if hasattr(cls, '__origin__') else cls
+    annotations = cls.__annotations__ if hasattr(cls, "__annotations__") else cls
+    cls = cls.__origin__ if hasattr(cls, "__origin__") else cls
 
     if dataclasses.is_dataclass(cls):
         kwargs = {}
@@ -18,7 +18,10 @@ def load_from_dict[T](cls: type[T], data: dict | list | Any) -> T:
     elif issubclass(cls, list):
         return [load_from_dict(annotations.__args__[0], i) for i in data]
     elif issubclass(cls, dict):
-        return {key: load_from_dict(annotations.__args__[1], value) for key, value in data.items()}
+        return {
+            key: load_from_dict(annotations.__args__[1], value)
+            for key, value in data.items()
+        }
     else:
         return cls(data)
 
@@ -45,3 +48,9 @@ def load[T](cls: type[T], data: str) -> T:
 
 def dump(obj: Any) -> str:
     return json.dumps(dump_to_dict(obj))
+
+
+def transposed[T](lst: list[list[T]]) -> list[list[T]]:
+    if not lst:
+        return []
+    return [[lst[i][j] for i in range(len(lst))] for j in range(len(lst[0]))]
