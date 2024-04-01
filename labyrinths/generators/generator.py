@@ -55,6 +55,9 @@ class LabyrinthGenerator:
     def generate(self) -> LabyrinthData:
         raise NotImplementedError
 
+    def is_out_of_bounds(self, x: int, y: int) -> bool:
+        return not (0 <= x < self.columns and 0 <= y < self.rows)
+
     def set_wall_at(self, x: int, y: int, dx: int, dy: int, wallkind: WallKind) -> None:
         match (dx, dy):
             case (-1, 0):
