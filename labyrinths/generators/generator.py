@@ -59,16 +59,5 @@ class LabyrinthGenerator:
         return not (0 <= x < self.columns and 0 <= y < self.rows)
 
     def set_wall_at(self, x: int, y: int, dx: int, dy: int, wallkind: WallKind) -> None:
-        match (dx, dy):
-            case (-1, 0):
-                self.current.field[x][y].left = wallkind
-                self.current.field[x - 1][y].right = wallkind
-            case (1, 0):
-                self.current.field[x][y].right = wallkind
-                self.current.field[x + 1][y].left = wallkind
-            case (0, -1):
-                self.current.field[x][y].down = wallkind
-                self.current.field[x][y - 1].up = wallkind
-            case (0, 1):
-                self.current.field[x][y].up = wallkind
-                self.current.field[x][y + 1].down = wallkind
+        self.current.field[x][y].set_wall_at(dx, dy, wallkind)
+        self.current.field[x + dx][y + dy].set_wall_at(-dx, -dy, wallkind)

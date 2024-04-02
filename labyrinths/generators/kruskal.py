@@ -66,8 +66,12 @@ class KruskalGenerator(LabyrinthGenerator):
 
         for edge in edges:
             if dsu.union(self.cell_id(*edge.source), self.cell_id(*edge.destination)):
-                self.set_wall_at(edge.source[0], edge.source[1],
-                                 edge.destination[0] - edge.source[0],
-                                 edge.destination[1] - edge.source[1], WallKind.EMPTY)
+                self.set_wall_at(
+                    edge.source[0],
+                    edge.source[1],
+                    edge.destination[0] - edge.source[0],
+                    edge.destination[1] - edge.source[1],
+                    WallKind.EMPTY,
+                )
 
         return self.current

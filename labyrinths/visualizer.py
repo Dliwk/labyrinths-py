@@ -1,4 +1,5 @@
 """Simple module to visualize maze using pygame"""
+
 import random
 import sys
 
@@ -9,6 +10,7 @@ from labyrinths.generators.dfs import DepthFirstSearchGenerator
 from labyrinths.generators.kruskal import KruskalGenerator
 from labyrinths.labyrinth import LabyrinthData, WallKind
 from labyrinths.mazeloader import dump_maze
+from labyrinths.solver import LabyrinthSolver, Solution
 
 pygame.init()
 pygame.font.init()
@@ -45,9 +47,11 @@ class Visualizer:
         self.font = pygame.font.Font(None, self.cellheight)
 
         self.current_maze: LabyrinthData | None = None
+        self.current_solution: Solution | None = None
 
     def draw_maze(self, maze: LabyrinthData) -> None:
         self.current_maze = maze
+        self.current_solution = LabyrinthSolver(maze).solve()
 
         for i in range(maze.columns):
             for j in range(maze.rows):
@@ -89,11 +93,37 @@ class Visualizer:
                         0,
                     )
 
+        self.draw_solution()
+
+    def _get_begin_of_cell(self, i: int, j: int) -> (int, int):
+        return (
+            i * self.cellwidth,
+            (self.current_maze.rows - j - 1) * self.cellheight,
+        )
+
+    def _get_center_of_cell(self, i: int, j: int) -> (int, int):
+        x, y = self._get_begin_of_cell(i, j)
+        return x + self.cellwidth // 2, y + self.cellheight // 2
+
+    def draw_solution(self):
+        """Draw the solution path"""
+        for (i, j), (ni, nj) in zip(self.current_solution.path, self.current_solution.path[1:]):
+            x, y = self._get_center_of_cell(i, j)
+            nx, ny = self._get_center_of_cell(ni, nj)
+
+            draw.line(self.screen, 'red', (x, y), (nx, ny), 4)
+
     def new_maze(self) -> None:
-        generator_class, generator_args, algoname = random.choice((
-            (DepthFirstSearchGenerator, (self.columns, self.rows), 'Depth First Search'),
-            (KruskalGenerator, (self.columns, self.rows), 'Kruskal'),
-        ))
+        generator_class, generator_args, algoname = random.choice(
+            (
+                (
+                    DepthFirstSearchGenerator,
+                    (self.columns, self.rows),
+                    "Depth First Search",
+                ),
+                (KruskalGenerator, (self.columns, self.rows), "Kruskal"),
+            )
+        )
         generator = generator_class(*generator_args)
 
         maze = generator.generate()
