@@ -8,10 +8,12 @@ sys.setrecursionlimit(100_000)
 
 
 def main():
-    parser = argparse.ArgumentParser(prog='labyrinths', description='generate or solve mazes')
-    parser.add_argument('-v', '--visual', help='run visualizer', action='store_true')
+    parser = argparse.ArgumentParser(
+        prog="labyrinths", description="generate or solve mazes"
+    )
+    parser.add_argument("-v", "--visual", help="run visualizer", action="store_true")
     # parser.add_argument('--loadfrom', help='load maze into visualizer window', type=argparse.FileType())
-    parser.add_argument('--loadfrom', help='load maze into visualizer window')
+    parser.add_argument("--loadfrom", help="load maze into visualizer window")
     args = parser.parse_args()
 
     if args.visual:

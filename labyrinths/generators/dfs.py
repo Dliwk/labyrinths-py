@@ -18,13 +18,15 @@ class DepthFirstSearchGenerator(LabyrinthGenerator):
         random.shuffle(order)
 
         for dx, dy in order:
-            if not self.is_out_of_bounds(x + dx, y + dy) and not self.visited[x + dx][y + dy]:
+            if (
+                not self.is_out_of_bounds(x + dx, y + dy)
+                and not self.visited[x + dx][y + dy]
+            ):
                 self.set_wall_at(x, y, dx, dy, WallKind.EMPTY)
                 self.visit(x + dx, y + dy)
 
     @override
     def generate(self) -> LabyrinthData:
-        self.current = self.get_filled_maze(self.columns, self.rows)
         self.visited = [[False for _ in range(self.rows)] for _ in range(self.columns)]
         self.visit(0, 0)
         return self.current

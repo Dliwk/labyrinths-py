@@ -5,7 +5,7 @@ class LabyrinthGenerator:
     def __init__(self, columns: int, rows: int) -> None:
         self.columns = columns
         self.rows = rows
-        self.current: LabyrinthData = self.get_empty_maze(columns, rows)
+        self.current: LabyrinthData = self.get_filled_maze(columns, rows)
 
     def get_empty_maze(self, columns: int, rows: int) -> LabyrinthData:
         data = LabyrinthData(
