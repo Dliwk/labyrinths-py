@@ -28,5 +28,5 @@ class DepthFirstSearchGenerator(LabyrinthGenerator):
     @override
     def generate(self) -> LabyrinthData:
         self.visited = [[False for _ in range(self.rows)] for _ in range(self.columns)]
-        self.visit(0, 0)
+        self.visit(self.columns // 2, self.rows // 2)
         return self.current

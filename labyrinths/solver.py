@@ -11,6 +11,10 @@ class Solution:
     path: list[(int, int)]
 
 
+class NoSolution(Exception):
+    pass
+
+
 class LabyrinthSolver:
     """Solver for labyrinths."""
 
@@ -53,7 +57,10 @@ class LabyrinthSolver:
         current = self.end
         while current != self.begin:
             path.append(current)
-            current = self.previous[current]
+            try:
+                current = self.previous[current]
+            except KeyError:
+                raise NoSolution
         path.append(self.begin)
         path.reverse()
 
