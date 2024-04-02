@@ -1,3 +1,5 @@
+"""Generate mazes using depth first search algorithm."""
+
 import random
 from typing import override
 
@@ -6,11 +8,14 @@ from labyrinths.labyrinth import LabyrinthData, Cell, WallKind, CellKind
 
 
 class DepthFirstSearchGenerator(LabyrinthGenerator):
+    """Generate mazes using depth first search."""
+
     def __init__(self, columns: int, rows: int):
         super().__init__(columns, rows)
         self.visited: list[list[bool]] | None = None
 
     def visit(self, x: int, y: int) -> None:
+        """Visit cell."""
         assert self.current
         self.visited[x][y] = True
 
@@ -27,6 +32,7 @@ class DepthFirstSearchGenerator(LabyrinthGenerator):
 
     @override
     def generate(self) -> LabyrinthData:
+        """Generate maze."""
         self.visited = [[False for _ in range(self.rows)] for _ in range(self.columns)]
         self.visit(self.columns // 2, self.rows // 2)
         return self.current

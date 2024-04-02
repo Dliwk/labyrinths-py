@@ -17,6 +17,8 @@ pygame.font.init()
 
 
 class Visualizer:
+    """Main class to visualize mazes."""
+
     def __init__(self, columns: int, rows: int) -> None:
         self.columns = columns
         self.rows = rows
@@ -50,6 +52,7 @@ class Visualizer:
         self.current_solution: Solution | None = None
 
     def draw_maze(self, maze: LabyrinthData) -> None:
+        """Draw the given maze on the screen."""
         self.current_maze = maze
         self.current_solution = LabyrinthSolver(maze).solve()
 
@@ -106,14 +109,17 @@ class Visualizer:
         return x + self.cellwidth // 2, y + self.cellheight // 2
 
     def draw_solution(self):
-        """Draw the solution path"""
-        for (i, j), (ni, nj) in zip(self.current_solution.path, self.current_solution.path[1:]):
+        """Draw the solution path of the current maze on the screen."""
+        for (i, j), (ni, nj) in zip(
+                self.current_solution.path, self.current_solution.path[1:]
+        ):
             x, y = self._get_center_of_cell(i, j)
             nx, ny = self._get_center_of_cell(ni, nj)
 
-            draw.line(self.screen, 'red', (x, y), (nx, ny), 4)
+            draw.line(self.screen, "red", (x, y), (nx, ny), 4)
 
     def new_maze(self) -> None:
+        """Draw the new maze on the screen."""
         generator_class, generator_args, algoname = random.choice(
             (
                 (
@@ -132,6 +138,7 @@ class Visualizer:
         self.set_algoname(algoname)
 
     def set_algoname(self, algoname: str) -> None:
+        """Set the algorithm name on the bottom corner of the screen."""
         draw.rect(
             self.globalscreen,
             "white",
@@ -146,6 +153,7 @@ class Visualizer:
         self.globalscreen.blit(text, (0, self.globalheight - self.cellheight))
 
     def run(self, maze: LabyrinthData | None = None):
+        """Run the visualizer event loop."""
         pygame.display.set_caption("Labyrinths")
 
         text = self.font.render(

@@ -1,3 +1,5 @@
+"""Utility functions for different purposes."""
+
 import dataclasses
 import json
 from typing import Any
@@ -5,6 +7,7 @@ import enum
 
 
 def load_from_dict[T](cls: type[T], data: dict | list | Any) -> T:
+    """Load arbitrary annotated class from a dict."""
     annotations = cls.__annotations__ if hasattr(cls, "__annotations__") else cls
     cls = cls.__origin__ if hasattr(cls, "__origin__") else cls
 
@@ -27,6 +30,7 @@ def load_from_dict[T](cls: type[T], data: dict | list | Any) -> T:
 
 
 def dump_to_dict(obj: Any) -> dict | Any:
+    """Dump arbitrary object to a dict."""
     if dataclasses.is_dataclass(obj):
         result = {}
         for name, value in obj.__dict__.items():
@@ -43,14 +47,17 @@ def dump_to_dict(obj: Any) -> dict | Any:
 
 
 def load[T](cls: type[T], data: str) -> T:
+    """Load arbitrary annotated class from a json string."""
     return load_from_dict(cls, json.loads(data))
 
 
 def dump(obj: Any) -> str:
+    """Dump arbitrary object into a json string."""
     return json.dumps(dump_to_dict(obj))
 
 
 def transposed[T](lst: list[list[T]]) -> list[list[T]]:
+    """Transpose a two-dimensional list."""
     if not lst:
         return []
     return [[lst[i][j] for i in range(len(lst))] for j in range(len(lst[0]))]

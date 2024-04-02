@@ -1,13 +1,18 @@
+"""Module with base class for generators."""
+
 from labyrinths.labyrinth import LabyrinthData, WallKind, CellKind, Cell
 
 
 class LabyrinthGenerator:
+    """Basic class for generating mazes."""
+
     def __init__(self, columns: int, rows: int) -> None:
         self.columns = columns
         self.rows = rows
         self.current: LabyrinthData = self.get_filled_maze(columns, rows)
 
     def get_empty_maze(self, columns: int, rows: int) -> LabyrinthData:
+        """Gen dummy maze without any walls."""
         data = LabyrinthData(
             columns,
             rows,
@@ -34,6 +39,7 @@ class LabyrinthGenerator:
         return data
 
     def get_filled_maze(self, columns: int, rows: int) -> LabyrinthData:
+        """Get maze filled with walls."""
         return LabyrinthData(
             columns,
             rows,
@@ -53,11 +59,14 @@ class LabyrinthGenerator:
         )
 
     def generate(self) -> LabyrinthData:
+        """Generate maze, virtual function."""
         raise NotImplementedError
 
     def is_out_of_bounds(self, x: int, y: int) -> bool:
+        """Check if (x, y) is out of bounds."""
         return not (0 <= x < self.columns and 0 <= y < self.rows)
 
     def set_wall_at(self, x: int, y: int, dx: int, dy: int, wallkind: WallKind) -> None:
+        """Set wall between (x, y) and (x + dx, y + dy)."""
         self.current.field[x][y].set_wall_at(dx, dy, wallkind)
         self.current.field[x + dx][y + dy].set_wall_at(-dx, -dy, wallkind)

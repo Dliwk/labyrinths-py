@@ -1,13 +1,17 @@
+"""Utility functions for loading and storing mazes in files."""
+
 from labyrinths.labyrinth import LabyrinthData
 from labyrinths.utils import load, dump
 import gzip
 
 
 def load_maze(path: str) -> LabyrinthData:
+    """Load a maze from given path"""
     with open(path, "rb") as file:
         return load(LabyrinthData, gzip.decompress(file.read()).decode())
 
 
 def dump_maze(maze: LabyrinthData, path: str) -> None:
+    """Dump a maze into given path. Usually extension is .json.gz"""
     with open(path, "wb") as file:
         file.write(gzip.compress(dump(maze).encode()))

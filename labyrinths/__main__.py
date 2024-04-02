@@ -1,3 +1,5 @@
+"""Main entry point."""
+
 from labyrinths.labyrinth import LabyrinthData
 from labyrinths.mazeloader import load_maze
 import sys
@@ -8,12 +10,14 @@ sys.setrecursionlimit(100_000)
 
 
 def main():
+    """Main function."""
     parser = argparse.ArgumentParser(
         prog="labyrinths", description="generate or solve mazes"
     )
     parser.add_argument("-v", "--visual", help="run visualizer", action="store_true")
     # parser.add_argument('--loadfrom', help='load maze into visualizer window', type=argparse.FileType())
     parser.add_argument("--loadfrom", help="load maze into visualizer window")
+    parser.add_argument("--size", help="select maze size", default="59,39")
     args = parser.parse_args()
 
     if args.visual:
@@ -24,7 +28,7 @@ def main():
             vis = visualizer.Visualizer(maze.columns, maze.rows)
             vis.run(maze)
         else:
-            vis = visualizer.Visualizer(40, 30)
+            vis = visualizer.Visualizer(*map(int, args.size.split(',')))
             vis.run()
 
 

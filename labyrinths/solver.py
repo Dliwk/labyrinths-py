@@ -8,11 +8,12 @@ from labyrinths.labyrinth import LabyrinthData, WallKind
 
 @dataclass
 class Solution:
+    """Labyrinth solution."""
     path: list[(int, int)]
 
 
 class NoSolution(Exception):
-    pass
+    """Raised when no solution is found."""
 
 
 class LabyrinthSolver:

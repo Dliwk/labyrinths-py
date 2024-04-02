@@ -1,3 +1,5 @@
+"""Minimum spanning tree based labyrinth generator."""
+
 import random
 from dataclasses import dataclass
 from typing import override
@@ -8,17 +10,21 @@ from labyrinths.labyrinth import LabyrinthData, WallKind
 
 @dataclass
 class Edge:
+    """Edge data."""
     source: (int, int)
     destination: (int, int)
     weight: float
 
 
 class DisjointSetUnion:
+    """Disjoint set union data structure."""
+
     def __init__(self, n: int) -> None:
         self.parent = [i for i in range(n)]
         self.rank = [0 for _ in range(n)]
 
     def find(self, x: int) -> int:
+        """Find the root of a tree of x."""
         while self.parent[x] != x:
             y = self.parent[x]
             self.parent[x] = self.parent[y]
@@ -26,6 +32,7 @@ class DisjointSetUnion:
         return x
 
     def union(self, x: int, y: int) -> bool:
+        """Union two trees."""
         x = self.find(x)
         y = self.find(y)
         if x == y:
@@ -41,17 +48,19 @@ class DisjointSetUnion:
 
 
 class KruskalGenerator(LabyrinthGenerator):
+    """Generate mazes using Kruskal algorithm."""
     def __init__(self, columns: int, rows: int) -> None:
         super().__init__(columns, rows)
 
-    def cell_id(self, x: int, y: int) -> int:
+    def _cell_id(self, x: int, y: int) -> int:
         return x * self.rows + y
 
-    def cell_by_id(self, i: int) -> (int, int):
+    def _cell_by_id(self, i: int) -> (int, int):
         return i // self.rows, i % self.rows
 
     @override
     def generate(self) -> LabyrinthData:
+        """Do the generation."""
         edges: list[Edge] = []
         for i in range(self.columns):
             for j in range(self.rows):
@@ -65,7 +74,7 @@ class KruskalGenerator(LabyrinthGenerator):
         dsu = DisjointSetUnion(self.columns * self.rows)
 
         for edge in edges:
-            if dsu.union(self.cell_id(*edge.source), self.cell_id(*edge.destination)):
+            if dsu.union(self._cell_id(*edge.source), self._cell_id(*edge.destination)):
                 self.set_wall_at(
                     edge.source[0],
                     edge.source[1],
