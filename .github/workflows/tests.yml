@@ -17,7 +17,7 @@ jobs:
         os:
           - ubuntu-latest
           # - macos-latest
-          - windows-latest
+          #- windows-latest
         python-version:
           - "3.12"
 
@@ -38,24 +38,6 @@ jobs:
         run: |
           python -m hatch run test:test
 
-      - name: "Upload coverage data"
-        uses: actions/upload-artifact@master
-        with:
-          name: "covdata-${{ matrix.os }} "
-          path: coverage.xml
-
-  coverage:
-    name: Coverage
-    needs: tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Check out the repo"
-        uses: "actions/checkout@master"
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: covdata-ubuntu-latest
-
       - uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: true # optional (default = false)
@@ -64,3 +46,4 @@ jobs:
           name: codecov # optional
           token: ${{ secrets.CODECOV_TOKEN }} # required
           verbose: true # optional (default = false)
+
