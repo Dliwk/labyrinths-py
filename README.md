@@ -1,6 +1,8 @@
 # labyrinths.py
 Генерация, решение и совместное прохождение лабиринтов на Python
 
+[![codecov](https://codecov.io/github/Dliwk/labyrinths-py/graph/badge.svg?token=XadHp4cYfA)](https://codecov.io/github/Dliwk/labyrinths-py)
+
 ## Функционал
 - Генерация с помощью DFS или минимального остовного дерева; различные алгоритмы поиска мин. остова
 - Вариант генерации выбирается с помощью аргумента командной строки
