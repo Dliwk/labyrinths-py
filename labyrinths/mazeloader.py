@@ -1,8 +1,9 @@
 """Utility functions for loading and storing mazes in files."""
 
-from labyrinths.labyrinth import LabyrinthData
-from labyrinths.utils import load, dump
 import gzip
+
+from labyrinths.labyrinth import LabyrinthData
+from labyrinths.utils import dump, load
 
 
 def load_maze(path: str) -> LabyrinthData:

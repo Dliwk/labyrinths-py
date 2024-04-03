@@ -1,6 +1,6 @@
 """Module with base class for generators."""
 
-from labyrinths.labyrinth import LabyrinthData, WallKind, CellKind, Cell
+from labyrinths.labyrinth import Cell, CellKind, LabyrinthData, WallKind
 
 
 class LabyrinthGenerator:
@@ -11,7 +11,8 @@ class LabyrinthGenerator:
         self.rows = rows
         self.current: LabyrinthData = self.get_filled_maze(columns, rows)
 
-    def get_empty_maze(self, columns: int, rows: int) -> LabyrinthData:
+    @classmethod
+    def get_empty_maze(cls, columns: int, rows: int) -> LabyrinthData:
         """Gen dummy maze without any walls."""
         data = LabyrinthData(
             columns,
@@ -30,15 +31,16 @@ class LabyrinthGenerator:
                 for _ in range(columns)
             ],
         )
-        for x in range(self.columns):
+        for x in range(columns):
             data.field[x][0].up = WallKind.WALL
             data.field[x][rows - 1].down = WallKind.WALL
-        for y in range(self.rows):
+        for y in range(rows):
             data.field[0][y].left = WallKind.WALL
             data.field[columns - 1][y].right = WallKind.WALL
         return data
 
-    def get_filled_maze(self, columns: int, rows: int) -> LabyrinthData:
+    @classmethod
+    def get_filled_maze(cls, columns: int, rows: int) -> LabyrinthData:
         """Get maze filled with walls."""
         return LabyrinthData(
             columns,
@@ -60,7 +62,7 @@ class LabyrinthGenerator:
 
     def generate(self) -> LabyrinthData:
         """Generate maze, virtual function."""
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def is_out_of_bounds(self, x: int, y: int) -> bool:
         """Check if (x, y) is out of bounds."""

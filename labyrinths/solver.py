@@ -9,7 +9,8 @@ from labyrinths.labyrinth import LabyrinthData, WallKind
 @dataclass
 class Solution:
     """Labyrinth solution."""
-    path: list[(int, int)]
+
+    path: list[tuple[int, int]]
 
 
 class NoSolution(Exception):
@@ -20,10 +21,10 @@ class LabyrinthSolver:
     """Solver for labyrinths."""
 
     def __init__(
-            self,
-            maze: LabyrinthData,
-            begin: (int, int) = (0, 0),
-            end: tuple[int, int] | None = None,
+        self,
+        maze: LabyrinthData,
+        begin: tuple[int, int] = (0, 0),
+        end: tuple[int, int] | None = None,
     ) -> None:
         self.begin = begin
         self.end = end or (maze.columns - 1, maze.rows - 1)
@@ -31,7 +32,7 @@ class LabyrinthSolver:
         self.maze = maze
 
         self.visited = [[False for _ in range(maze.rows)] for _ in range(maze.columns)]
-        self.previous: dict[(int, int), (int, int)] = {}
+        self.previous: dict[tuple[int, int], tuple[int, int]] = {}
         self.finished = False
 
     def solve(self) -> Solution:
@@ -44,10 +45,10 @@ class LabyrinthSolver:
             for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
                 nx, ny = x + dx, y + dy
                 if (
-                        self.maze.field[x][y].get_wall_at(dx, dy) == WallKind.EMPTY
-                        and 0 <= nx < self.size[0]
-                        and 0 <= ny < self.size[1]
-                        and not self.visited[nx][ny]
+                    self.maze.field[x][y].get_wall_at(dx, dy) == WallKind.EMPTY
+                    and 0 <= nx < self.size[0]
+                    and 0 <= ny < self.size[1]
+                    and not self.visited[nx][ny]
                 ):
                     self.visited[nx][ny] = True
                     self.previous[(nx, ny)] = (x, y)

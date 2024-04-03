@@ -1,15 +1,22 @@
 """Utility functions for different purposes."""
 
 import dataclasses
-import json
-from typing import Any
 import enum
+import json
+import typing
+from types import GenericAlias
+from typing import Any, TypeVar
+
+# Mypy doesn't support PEP695 generics yet.
+T = TypeVar("T")
 
 
-def load_from_dict[T](cls: type[T], data: dict | list | Any) -> T:
+# Hard to static type this function, giving up.
+@typing.no_type_check
+def load_from_dict(cls: type[T] | GenericAlias, data: dict | list | Any) -> T:
     """Load arbitrary annotated class from a dict."""
-    annotations = cls.__annotations__ if hasattr(cls, "__annotations__") else cls
-    cls = cls.__origin__ if hasattr(cls, "__origin__") else cls
+    annotations: dict[str, Any] | GenericAlias = cls.__annotations__ if hasattr(cls, "__annotations__") else cls
+    cls = cls.__origin__ if hasattr(cls, "__origin__") else cls  # type: ignore
 
     if dataclasses.is_dataclass(cls):
         kwargs = {}
@@ -21,10 +28,7 @@ def load_from_dict[T](cls: type[T], data: dict | list | Any) -> T:
     elif issubclass(cls, list):
         return [load_from_dict(annotations.__args__[0], i) for i in data]
     elif issubclass(cls, dict):
-        return {
-            key: load_from_dict(annotations.__args__[1], value)
-            for key, value in data.items()
-        }
+        return {key: load_from_dict(annotations.__args__[1], value) for key, value in data.items()}
     else:
         return cls(data)
 
@@ -46,7 +50,7 @@ def dump_to_dict(obj: Any) -> dict | Any:
         return obj
 
 
-def load[T](cls: type[T], data: str) -> T:
+def load(cls: type[T], data: str) -> T:
     """Load arbitrary annotated class from a json string."""
     return load_from_dict(cls, json.loads(data))
 
@@ -56,7 +60,7 @@ def dump(obj: Any) -> str:
     return json.dumps(dump_to_dict(obj))
 
 
-def transposed[T](lst: list[list[T]]) -> list[list[T]]:
+def transposed(lst: list[list[T]]) -> list[list[T]]:
     """Transpose a two-dimensional list."""
     if not lst:
         return []

@@ -1,17 +1,18 @@
 """Module containing classes related to labyrinth data."""
 
-from dataclasses import dataclass
-from utils import transposed
 import enum
+from dataclasses import dataclass
 
 
 class CellKind(enum.Enum):
     """Kind of cell. Currently, there is only one."""
+
     EMPTY = 0
 
 
 class WallKind(enum.Enum):
     """Kind of wall."""
+
     EMPTY = 0
     WALL = 1
 
@@ -19,6 +20,7 @@ class WallKind(enum.Enum):
 @dataclass
 class Cell:
     """Cell data."""
+
     kind: CellKind
     left: WallKind
     right: WallKind
@@ -32,9 +34,9 @@ class Cell:
                 self.left = wallkind
             case (1, 0):
                 self.right = wallkind
-            case (0, -1):
-                self.down = wallkind
             case (0, 1):
+                self.down = wallkind
+            case (0, -1):
                 self.up = wallkind
             case _:
                 raise Exception
@@ -46,9 +48,9 @@ class Cell:
                 return self.left
             case (1, 0):
                 return self.right
-            case (0, -1):
-                return self.down
             case (0, 1):
+                return self.down
+            case (0, -1):
                 return self.up
             case _:
                 raise Exception

@@ -22,20 +22,14 @@ class Visualizer:
     def __init__(self, columns: int, rows: int) -> None:
         self.columns = columns
         self.rows = rows
-        self.cellwidth = (
-            50 if columns < 10 else 20 if columns < 60 else 10 if columns < 120 else 5
-        )
-        self.cellheight = (
-            50 if rows < 10 else 20 if rows < 40 else 10 if rows < 80 else 5
-        )
+        self.cellwidth = 50 if columns < 10 else 20 if columns < 60 else 10 if columns < 120 else 5
+        self.cellheight = 50 if rows < 10 else 20 if rows < 40 else 10 if rows < 80 else 5
         self.cellwidth = self.cellheight = min(self.cellwidth, self.cellheight)
         self.wallwidth = 1
 
         self.globalwidth = self.columns * self.cellwidth + self.cellwidth * 2
         self.globalheight = self.rows * self.cellheight + self.cellheight * 2
-        self.globalscreen = pygame.display.set_mode(
-            (self.globalwidth, self.globalheight)
-        )
+        self.globalscreen = pygame.display.set_mode((self.globalwidth, self.globalheight))
         self.globalscreen.fill("white")
         self.screen = self.globalscreen.subsurface(
             pygame.Rect(
@@ -58,7 +52,7 @@ class Visualizer:
 
         for i in range(maze.columns):
             for j in range(maze.rows):
-                x, y = i * self.cellwidth, (maze.rows - j - 1) * self.cellheight
+                x, y = self._get_begin_of_cell(i, j)
                 dx, dy = self.cellwidth, self.cellheight
                 draw.rect(
                     self.screen,
@@ -98,21 +92,19 @@ class Visualizer:
 
         self.draw_solution()
 
-    def _get_begin_of_cell(self, i: int, j: int) -> (int, int):
+    def _get_begin_of_cell(self, i: int, j: int) -> tuple[int, int]:
         return (
             i * self.cellwidth,
-            (self.current_maze.rows - j - 1) * self.cellheight,
+            j * self.cellheight,
         )
 
-    def _get_center_of_cell(self, i: int, j: int) -> (int, int):
+    def _get_center_of_cell(self, i: int, j: int) -> tuple[int, int]:
         x, y = self._get_begin_of_cell(i, j)
         return x + self.cellwidth // 2, y + self.cellheight // 2
 
     def draw_solution(self):
         """Draw the solution path of the current maze on the screen."""
-        for (i, j), (ni, nj) in zip(
-                self.current_solution.path, self.current_solution.path[1:]
-        ):
+        for (i, j), (ni, nj) in zip(self.current_solution.path, self.current_solution.path[1:], strict=False):
             x, y = self._get_center_of_cell(i, j)
             nx, ny = self._get_center_of_cell(ni, nj)
 
@@ -156,9 +148,7 @@ class Visualizer:
         """Run the visualizer event loop."""
         pygame.display.set_caption("Labyrinths")
 
-        text = self.font.render(
-            "Mouse click to generate a maze! Press space to save to file", True, "black"
-        )
+        text = self.font.render("Mouse click to generate a maze! Press space to save to file", True, "black")
         self.globalscreen.blit(text, (0, 0))
 
         if maze is not None:
@@ -177,6 +167,7 @@ class Visualizer:
                         self.new_maze()
                     case pygame.KEYDOWN:
                         if event.key == pygame.K_SPACE:
+                            assert self.current_maze
                             dump_maze(self.current_maze, "maze.json.gz")
 
                 pygame.display.flip()

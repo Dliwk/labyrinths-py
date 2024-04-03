@@ -11,8 +11,9 @@ from labyrinths.labyrinth import LabyrinthData, WallKind
 @dataclass
 class Edge:
     """Edge data."""
-    source: (int, int)
-    destination: (int, int)
+
+    source: tuple[int, int]
+    destination: tuple[int, int]
     weight: float
 
 
@@ -49,14 +50,12 @@ class DisjointSetUnion:
 
 class KruskalGenerator(LabyrinthGenerator):
     """Generate mazes using Kruskal algorithm."""
+
     def __init__(self, columns: int, rows: int) -> None:
         super().__init__(columns, rows)
 
     def _cell_id(self, x: int, y: int) -> int:
         return x * self.rows + y
-
-    def _cell_by_id(self, i: int) -> (int, int):
-        return i // self.rows, i % self.rows
 
     @override
     def generate(self) -> LabyrinthData:
