@@ -18,7 +18,6 @@ def load_from_dict(cls: type[T] | GenericAlias, data: dict | list | Any) -> T:
     annotations: dict[str, Any] | GenericAlias = cls.__annotations__ if hasattr(cls, "__annotations__") else cls
     cls = cls.__origin__ if hasattr(cls, "__origin__") else cls  # type: ignore
 
-    print(cls, type(cls))
     if dataclasses.is_dataclass(cls):
         kwargs = {}
         for name, annotation in annotations.items():
