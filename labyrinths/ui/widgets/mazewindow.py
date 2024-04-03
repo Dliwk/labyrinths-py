@@ -5,12 +5,14 @@ import random
 import pygame
 from pygame import draw
 
+from labyrinths.generators.dfs import DepthFirstSearchGenerator
 from labyrinths.generators.kruskal import KruskalGenerator
 from labyrinths.maze import MazeData, WallKind
 from labyrinths.mazeloader import dump_maze, load_maze
 from labyrinths.solver import MazeSolver, Solution
 from labyrinths.ui import Widget
 from labyrinths.ui.widgets.button import Button
+from labyrinths.ui.widgets.label import TextLabel
 
 
 class MazeWidget(Widget):
@@ -26,15 +28,50 @@ class MazeWidget(Widget):
         self.maze_viewport = (0, 0)
         self.solution: Solution | None = None
 
+        self.generators = [
+            (KruskalGenerator, "Kruskal MST"),
+            (DepthFirstSearchGenerator, "DFS"),
+        ]
+        self.gen_id = 0
+
+        self.help_widget = TextLabel(
+            self,
+            300,
+            300,
+            30,
+            30,
+            # fmt: off
+            text=("Use arrows keys to move\n"
+                  "By default, mazes\n"
+                  "are saved into\n"
+                  "maze.json.gz"),
+            # fmt: on
+        )
+        self.help_widget.hide()
+
         Button(self, 100, 30, 0, self.height - 30, onclick=self.new_maze, text="new maze")
+        self.next_gen_button = Button(self, 120, 30, 0, self.height - 60, onclick=self.next_gen, text="")
         Button(self, 100, 30, self.width - 100, self.height - 30, onclick=self.show_solution, text="solution")
         Button(self, 30, 30, self.width - 30, 0, onclick=self.scale_up, text="+")
         Button(self, 30, 30, self.width - 60, 0, onclick=self.scale_down, text="-")
         Button(self, 60, 30, self.width - 60, self.height // 2, onclick=self.save_maze, text="save")
         Button(self, 60, 30, self.width - 60, self.height // 2 - 30, onclick=self.load_maze, text="load")
+        Button(self, 30, 30, 0, 0, onclick=self.toggle_help, text="?")
+
+        self.next_gen()
+
+    def next_gen(self):
+        self.gen_id += 1
+        if self.gen_id == len(self.generators):
+            self.gen_id = 0
+        self.next_gen_button.text = self.generators[self.gen_id][1]
+
+    def toggle_help(self):
+        self.help_widget.toggle()
 
     def new_maze(self) -> None:
-        self.set_maze(KruskalGenerator(random.randint(10, 60), random.randint(10, 50)).generate())
+        gen_class = self.generators[self.gen_id][0]
+        self.set_maze(gen_class(random.randint(10, 60), random.randint(10, 50)).generate())
 
     def save_maze(self) -> None:
         assert self.current_maze

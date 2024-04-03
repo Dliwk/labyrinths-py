@@ -1,7 +1,11 @@
 """Main windowing module, defines the global surface."""
 
+from __future__ import annotations
+
 import abc
+import enum
 import sys
+import weakref
 from abc import abstractmethod
 
 import pygame
@@ -23,14 +27,16 @@ class Widget(abc.ABC):
         self.hidden = False
 
     @abstractmethod
-    def render(self) -> None:
-        ...
+    def render(self) -> None: ...
 
     def hide(self):
         self.hidden = True
 
     def show(self):
         self.hidden = False
+
+    def toggle(self) -> None:
+        self.hidden = not self.hidden
 
     def on_keydown(self, key: int) -> None:
         pass
@@ -67,14 +73,25 @@ class Widget(abc.ABC):
     def on_mouse_left_click(self) -> None:
         pass
 
-    def on_mouse_click_check(self, x: int, y: int) -> bool:
+    def on_mouse_hover(self) -> None:
+        pass
+
+    def on_mouse_hover_end(self) -> None:
+        pass
+
+    def on_mouse_right_click(self) -> None:
+        pass
+
+    def get_widget_at(self, x: int, y: int) -> weakref.ref[Widget] | None:
+        if self.hidden:
+            return None
         if 0 <= x < self.width and 0 <= y < self.height:
             for child in reversed(self.children):
-                if child.on_mouse_click_check(x - child.coordinates[0], y - child.coordinates[1]):
-                    return True
-            self.on_mouse_left_click()
-            return True
-        return False
+                result = child.get_widget_at(x - child.coordinates[0], y - child.coordinates[1])
+                if result is not None:
+                    return result
+            return weakref.ref(self)
+        return None
 
 
 class RootWidget(Widget):
@@ -95,16 +112,48 @@ class MainWindow:
         self.height = height
         self.screen = pygame.display.set_mode((self.width, self.height))
         self.root_widget: RootWidget = RootWidget(self.width, self.height)
+        self.hovered_widget: weakref.ref[Widget] | None = None
 
     def render(self) -> None:
         """Render everything."""
         self.root_widget.render_self_and_children(self.screen, (0, 0))
 
     def on_mouse_left_click(self, x: int, y: int) -> None:
-        self.root_widget.on_mouse_click_check(x, y)
+        ref = self.root_widget.get_widget_at(x, y)
+        if ref is None:
+            return
+        result = ref()
+        if result is None:
+            return
+        result.on_mouse_left_click()
+
+    def on_mouse_right_click(self, x: int, y: int) -> None:
+        ref = self.root_widget.get_widget_at(x, y)
+        if ref is None:
+            return
+        result = ref()
+        if result is None:
+            return
+        result.on_mouse_right_click()
+
+    def on_mouse_hover(self, x: int, y: int) -> None:
+        result = self.root_widget.get_widget_at(x, y)
+        if result != self.hovered_widget:
+            if self.hovered_widget is not None:
+                widget = self.hovered_widget()
+                if widget:
+                    widget.on_mouse_hover_end()
+            if result is not None:
+                widget = result()
+                if widget:
+                    widget.on_mouse_hover()
+            self.hovered_widget = result
 
     def run(self) -> None:
         """Run the event loop."""
+
+        clock = pygame.time.Clock()
+
         while True:
             for event in pygame.event.get():
                 match event.type:
@@ -118,5 +167,11 @@ class MainWindow:
                     case pygame.MOUSEBUTTONDOWN:
                         if event.button == 1:
                             self.on_mouse_left_click(*event.pos)
+                        elif event.button == 2:
+                            self.on_mouse_right_click(*event.pos)
+                    case pygame.MOUSEMOTION:
+                        self.on_mouse_hover(*event.pos)
             self.render()
             pygame.display.flip()
+
+            clock.tick(60)

@@ -2,14 +2,11 @@
 
 from typing import Callable
 
-import pygame
-from pygame import draw
-
 from labyrinths.ui import Widget
+from labyrinths.ui.widgets.label import TextLabel
 
 
-class Button(Widget):
-    """A simple button widget."""
+class Button(TextLabel):
 
     def __init__(
         self,
@@ -21,21 +18,20 @@ class Button(Widget):
         onclick: Callable[[], None],
         text: str = "button",
         color: tuple[int, int, int] = (200, 200, 200),
+        hovered_color: tuple[int, int, int] = (150, 150, 150),
         text_color: tuple[int, int, int] = (0, 0, 0),
         fontsize: int = 25,
     ) -> None:
-        super().__init__(parent, width, height, x, y)
-        self.text = text
+        super().__init__(parent, width, height, x, y, text, color, text_color, fontsize)
         self.onclick = onclick
-        self.color = color
-        self.text_color = text_color
-        self.font = pygame.font.Font(None, fontsize)
+        self.normal_color = color
+        self.hovered_color = hovered_color
 
     def on_mouse_left_click(self) -> None:
         self.onclick()
 
-    def render(self) -> None:
-        draw.rect(self.surface, self.color, pygame.Rect((0, 0, self.width, self.height)))
-        rendered_text = self.font.render(self.text, True, self.text_color)
-        xsize, ysize = rendered_text.get_size()
-        self.surface.blit(rendered_text, (self.width // 2 - xsize // 2, self.height // 2 - ysize // 2))
+    def on_mouse_hover(self) -> None:
+        self.color = self.hovered_color
+
+    def on_mouse_hover_end(self) -> None:
+        self.color = self.normal_color
