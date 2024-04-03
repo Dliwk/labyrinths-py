@@ -13,4 +13,4 @@ def test_maze_window(pygame_headless) -> None:
     mazewidget = MazeWidget(mainwindow.root_widget, 800, 600, 0, 0)
 
     mazewidget.new_maze()
-    mazewidget.show_solution()
+    mazewidget.toggle_solution()

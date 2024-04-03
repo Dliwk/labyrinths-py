@@ -25,7 +25,7 @@ class MazeWidget(Widget):
         self.solution_line_width = 4
 
         self.current_maze: MazeData | None = None
-        self.maze_viewport = (0, 0)
+        self.maze_viewport = (-self.cellsize * 3, -self.cellsize * 3)
         self.solution: Solution | None = None
 
         self.generators = [
@@ -41,7 +41,8 @@ class MazeWidget(Widget):
             30,
             30,
             # fmt: off
-            text=("Use arrows keys to move\n"
+            text=("Use arrows keys to move.\n"
+                  "WASD to look around.\n"
                   "By default, mazes\n"
                   "are saved into\n"
                   "maze.json.gz"),
@@ -51,7 +52,7 @@ class MazeWidget(Widget):
 
         Button(self, 100, 30, 0, self.height - 30, onclick=self.new_maze, text="new maze")
         self.next_gen_button = Button(self, 120, 30, 0, self.height - 60, onclick=self.next_gen, text="")
-        Button(self, 100, 30, self.width - 100, self.height - 30, onclick=self.show_solution, text="solution")
+        Button(self, 100, 30, self.width - 100, self.height - 30, onclick=self.toggle_solution, text="solution")
         Button(self, 30, 30, self.width - 30, 0, onclick=self.scale_up, text="+")
         Button(self, 30, 30, self.width - 60, 0, onclick=self.scale_down, text="-")
         Button(self, 60, 30, self.width - 60, self.height // 2, onclick=self.save_maze, text="save")
@@ -59,6 +60,8 @@ class MazeWidget(Widget):
         Button(self, 30, 30, 0, 0, onclick=self.toggle_help, text="?")
 
         self.next_gen()
+
+        self.player_coordinates = (0, 0)
 
     def next_gen(self):
         self.gen_id += 1
@@ -80,11 +83,18 @@ class MazeWidget(Widget):
     def load_maze(self) -> None:
         self.set_maze(load_maze("maze.json.gz"))
 
-    def show_solution(self) -> None:
+    def toggle_solution(self) -> None:
         assert self.current_maze is not None
+        if self.solution is not None:
+            self.solution = None
+        else:
+            self.show_solution()
+
+    def show_solution(self) -> None:
         self.solution = MazeSolver(self.current_maze).solve()
 
     def set_maze(self, maze: MazeData) -> None:
+        self.player_coordinates = (0, 0)
         self.current_maze = maze
         self.solution = None
 
@@ -112,20 +122,39 @@ class MazeWidget(Widget):
     def scale_down(self):
         self.cellsize -= 1
 
+    def try_move_player(self, dx: int, dy: int) -> None:
+        """Try to move player at given direction"""
+        x, y = self.player_coordinates
+        if self.current_maze.field[x][y].get_wall_at(dx, dy) == WallKind.EMPTY:
+            self.player_coordinates = (x + dx, y + dy)
+            self.check_end_game()
+
+    def check_end_game(self):
+        if self.player_coordinates == (self.current_maze.columns - 1, self.current_maze.rows - 1):
+            self.show_solution()
+
     def on_keydown(self, key: int) -> None:
         match key:
-            case pygame.K_LEFT:
+            case pygame.K_a:
                 self.maze_viewport = self.maze_viewport[0] - self.cellsize, self.maze_viewport[1]
-            case pygame.K_RIGHT:
+            case pygame.K_d:
                 self.maze_viewport = self.maze_viewport[0] + self.cellsize, self.maze_viewport[1]
-            case pygame.K_UP:
+            case pygame.K_w:
                 self.maze_viewport = self.maze_viewport[0], self.maze_viewport[1] - self.cellsize
-            case pygame.K_DOWN:
+            case pygame.K_s:
                 self.maze_viewport = self.maze_viewport[0], self.maze_viewport[1] + self.cellsize
             case pygame.K_o:
                 self.scale_up()
             case pygame.K_p:
                 self.scale_down()
+            case pygame.K_UP:
+                self.try_move_player(0, -1)
+            case pygame.K_LEFT:
+                self.try_move_player(-1, 0)
+            case pygame.K_DOWN:
+                self.try_move_player(0, 1)
+            case pygame.K_RIGHT:
+                self.try_move_player(1, 0)
 
     def draw_maze(self) -> None:
         """Draw the maze."""
@@ -170,6 +199,12 @@ class MazeWidget(Widget):
                         pygame.Rect(x, y + dy - self.wallwidth, dx, self.wallwidth),
                         0,
                     )
+        draw.circle(
+            self.surface,
+            'green',
+            self._get_center_of_cell(*self.player_coordinates),
+            (self.cellsize - self.wallwidth) // 2,
+        )
 
     def render(self) -> None:
         self.draw_maze()
