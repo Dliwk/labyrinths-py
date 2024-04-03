@@ -84,13 +84,13 @@ class MazeWidget(Widget):
         self.set_maze(load_maze("maze.json.gz"))
 
     def toggle_solution(self) -> None:
-        assert self.current_maze is not None
         if self.solution is not None:
             self.solution = None
         else:
             self.show_solution()
 
     def show_solution(self) -> None:
+        assert self.current_maze
         self.solution = MazeSolver(self.current_maze).solve()
 
     def set_maze(self, maze: MazeData) -> None:
@@ -125,6 +125,7 @@ class MazeWidget(Widget):
     def try_move_player(self, dx: int, dy: int) -> None:
         """Try to move player at given direction"""
         x, y = self.player_coordinates
+        assert self.current_maze
         if self.current_maze.field[x][y].get_wall_at(dx, dy) == WallKind.EMPTY:
             self.player_coordinates = (x + dx, y + dy)
             self.check_end_game()
@@ -201,7 +202,7 @@ class MazeWidget(Widget):
                     )
         draw.circle(
             self.surface,
-            'green',
+            "green",
             self._get_center_of_cell(*self.player_coordinates),
             (self.cellsize - self.wallwidth) // 2,
         )
