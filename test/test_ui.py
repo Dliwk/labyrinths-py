@@ -3,9 +3,9 @@
 import weakref
 
 import pygame
+from ui_common import pygame_headless
 
 from labyrinths.ui.mainwindow import MainWindow, Widget
-from ui_common import pygame_headless
 
 
 class EmptyWidget(Widget):

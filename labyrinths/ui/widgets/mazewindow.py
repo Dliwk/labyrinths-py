@@ -64,19 +64,23 @@ class MazeWidget(Widget):
         self.player_coordinates = (0, 0)
 
     def next_gen(self):
+        """Select next generator."""
         self.gen_id += 1
         if self.gen_id == len(self.generators):
             self.gen_id = 0
         self.next_gen_button.text = self.generators[self.gen_id][1]
 
     def toggle_help(self):
+        """Show/hide help message."""
         self.help_widget.toggle()
 
     def new_maze(self) -> None:
+        """Generate new maze."""
         gen_class = self.generators[self.gen_id][0]
         self.set_maze(gen_class(random.randint(10, 60), random.randint(10, 50)).generate())
 
     def save_maze(self) -> None:
+        """Save the maze into file."""
         assert self.current_maze
         dump_maze(self.current_maze, "maze.json.gz")
 
@@ -84,12 +88,14 @@ class MazeWidget(Widget):
         self.set_maze(load_maze("maze.json.gz"))
 
     def toggle_solution(self) -> None:
+        """Show/hide solution."""
         if self.solution is not None:
             self.solution = None
         else:
             self.show_solution()
 
     def show_solution(self) -> None:
+        """Show solution."""
         assert self.current_maze
         self.solution = MazeSolver(self.current_maze).solve()
 
@@ -117,9 +123,11 @@ class MazeWidget(Widget):
             draw.line(self.surface, "red", (x, y), (nx, ny), self.solution_line_width)
 
     def scale_up(self):
+        """Scale up the maze."""
         self.cellsize += 1
 
     def scale_down(self):
+        """Scale down the maze."""
         self.cellsize -= 1
 
     def try_move_player(self, dx: int, dy: int) -> None:
@@ -158,7 +166,6 @@ class MazeWidget(Widget):
                 self.try_move_player(1, 0)
 
     def draw_maze(self) -> None:
-        """Draw the maze."""
         maze = self.current_maze
         assert maze is not None
         for i in range(maze.columns):
@@ -200,6 +207,8 @@ class MazeWidget(Widget):
                         pygame.Rect(x, y + dy - self.wallwidth, dx, self.wallwidth),
                         0,
                     )
+
+    def draw_player(self) -> None:
         draw.circle(
             self.surface,
             "green",
@@ -211,3 +220,4 @@ class MazeWidget(Widget):
         self.draw_maze()
         if self.solution:
             self.draw_solution()
+        self.draw_player()

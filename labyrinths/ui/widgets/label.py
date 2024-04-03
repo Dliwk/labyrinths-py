@@ -7,7 +7,7 @@ from labyrinths.ui import Widget
 
 
 class TextLabel(Widget):
-    """A simple button widget."""
+    """A simple text label widget."""
 
     def __init__(
         self,
