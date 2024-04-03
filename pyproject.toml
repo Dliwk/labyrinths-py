@@ -18,7 +18,7 @@ authors = [
 license = { file = "LICENSE" }
 
 [tool.pytest.ini_options]
-addopts = "--import-mode=importlib --cov=labyrinths --cov-report html --cov-branch --verbose"
+addopts = "--import-mode=importlib --cov=labyrinths --cov-report html --cov-branch --verbose --junitxml=coverage.xml"
 testpaths = ["test"]
 pythonpath = [".", "test"]
 
