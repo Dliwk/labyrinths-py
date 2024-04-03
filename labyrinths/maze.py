@@ -57,7 +57,7 @@ class Cell:
 
 
 @dataclass
-class LabyrinthData:
+class MazeData:
     """Stores labyrinth data."""
 
     columns: int

@@ -8,9 +8,9 @@ from pygame import draw
 
 from labyrinths.generators.dfs import DepthFirstSearchGenerator
 from labyrinths.generators.kruskal import KruskalGenerator
-from labyrinths.labyrinth import LabyrinthData, WallKind
+from labyrinths.maze import MazeData, WallKind
 from labyrinths.mazeloader import dump_maze
-from labyrinths.solver import LabyrinthSolver, Solution
+from labyrinths.solver import MazeSolver, Solution
 
 pygame.init()
 pygame.font.init()
@@ -42,13 +42,13 @@ class Visualizer:
 
         self.font = pygame.font.Font(None, self.cellheight)
 
-        self.current_maze: LabyrinthData | None = None
+        self.current_maze: MazeData | None = None
         self.current_solution: Solution | None = None
 
-    def draw_maze(self, maze: LabyrinthData) -> None:
+    def draw_maze(self, maze: MazeData) -> None:
         """Draw the given maze on the screen."""
         self.current_maze = maze
-        self.current_solution = LabyrinthSolver(maze).solve()
+        self.current_solution = MazeSolver(maze).solve()
 
         for i in range(maze.columns):
             for j in range(maze.rows):
@@ -144,7 +144,7 @@ class Visualizer:
         text = self.font.render(algoname, True, "black")
         self.globalscreen.blit(text, (0, self.globalheight - self.cellheight))
 
-    def run(self, maze: LabyrinthData | None = None):
+    def run(self, maze: MazeData | None = None):
         """Run the visualizer event loop."""
         pygame.display.set_caption("Labyrinths")
 

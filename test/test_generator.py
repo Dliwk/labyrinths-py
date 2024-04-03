@@ -1,12 +1,12 @@
 import pytest
 from generators_common import check_maze_has_solution
 
-from labyrinths.generators.generator import LabyrinthGenerator
-from labyrinths.labyrinth import LabyrinthData, WallKind
+from labyrinths.generators.generator import MazeGenerator
+from labyrinths.maze import MazeData, WallKind
 from labyrinths.solver import NoSolution
 
 
-def check_maze_is_empty(maze: LabyrinthData) -> None:
+def check_maze_is_empty(maze: MazeData) -> None:
     """Check that the maze is correctly formed"""
 
     def is_out_of_bounds(i: int, j: int) -> bool:
@@ -23,11 +23,11 @@ def check_maze_is_empty(maze: LabyrinthData) -> None:
 
 @pytest.mark.parametrize("size", [(1, 2), (2, 3), (4, 1), (1, 1), (4, 4)])
 def test_maze_empty(size: tuple[int, int]) -> None:
-    maze = LabyrinthGenerator.get_empty_maze(*size)
+    maze = MazeGenerator.get_empty_maze(*size)
     check_maze_is_empty(maze)
 
 
 def test_no_solution() -> None:
-    maze = LabyrinthGenerator.get_filled_maze(2, 3)
+    maze = MazeGenerator.get_filled_maze(2, 3)
     with pytest.raises(NoSolution):
         check_maze_has_solution(maze)

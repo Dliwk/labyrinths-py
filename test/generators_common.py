@@ -1,9 +1,9 @@
 """Common test functionality for generators."""
 
-from labyrinths.labyrinth import LabyrinthData, WallKind
+from labyrinths.maze import MazeData, WallKind
 
 
-def check_maze_is_correctly_formed(maze: LabyrinthData) -> None:
+def check_maze_is_correctly_formed(maze: MazeData) -> None:
     """Check that the maze is correctly formed"""
 
     def is_out_of_bounds(i: int, j: int) -> bool:
@@ -18,9 +18,9 @@ def check_maze_is_correctly_formed(maze: LabyrinthData) -> None:
                     assert maze.field[x][y].get_wall_at(dx, dy) == maze.field[x + dx][y + dy].get_wall_at(-dx, -dy)
 
 
-def check_maze_has_solution(maze: LabyrinthData) -> None:
+def check_maze_has_solution(maze: MazeData) -> None:
     """Check that the maze has a solution."""
-    from labyrinths.solver import LabyrinthSolver
+    from labyrinths.solver import MazeSolver
 
     # Raises an exception on failure
-    LabyrinthSolver(maze).solve()
+    MazeSolver(maze).solve()

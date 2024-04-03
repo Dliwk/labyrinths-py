@@ -3,7 +3,7 @@
 from collections import deque
 from dataclasses import dataclass
 
-from labyrinths.labyrinth import LabyrinthData, WallKind
+from labyrinths.maze import MazeData, WallKind
 
 
 @dataclass
@@ -17,12 +17,12 @@ class NoSolution(Exception):
     """Raised when no solution is found."""
 
 
-class LabyrinthSolver:
+class MazeSolver:
     """Solver for labyrinths."""
 
     def __init__(
         self,
-        maze: LabyrinthData,
+        maze: MazeData,
         begin: tuple[int, int] = (0, 0),
         end: tuple[int, int] | None = None,
     ) -> None:

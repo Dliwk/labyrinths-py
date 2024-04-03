@@ -4,8 +4,8 @@ import random
 from dataclasses import dataclass
 from typing import override
 
-from labyrinths.generators.generator import LabyrinthGenerator
-from labyrinths.labyrinth import LabyrinthData, WallKind
+from labyrinths.generators.generator import MazeGenerator
+from labyrinths.maze import MazeData, WallKind
 
 
 @dataclass
@@ -48,7 +48,7 @@ class DisjointSetUnion:
         return True
 
 
-class KruskalGenerator(LabyrinthGenerator):
+class KruskalGenerator(MazeGenerator):
     """Generate mazes using Kruskal algorithm."""
 
     def __init__(self, columns: int, rows: int) -> None:
@@ -58,7 +58,7 @@ class KruskalGenerator(LabyrinthGenerator):
         return x * self.rows + y
 
     @override
-    def generate(self) -> LabyrinthData:
+    def generate(self) -> MazeData:
         """Do the generation."""
         edges: list[Edge] = []
         for i in range(self.columns):

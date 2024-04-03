@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-from labyrinths.labyrinth import LabyrinthData
+from labyrinths.maze import MazeData
 from labyrinths.mazeloader import load_maze
 
 # Для лучшей генерации
@@ -23,7 +23,7 @@ def main() -> None:
         from labyrinths import visualizer
 
         if args.loadfrom is not None:
-            maze: LabyrinthData = load_maze(args.loadfrom)
+            maze: MazeData = load_maze(args.loadfrom)
             vis = visualizer.Visualizer(maze.columns, maze.rows)
             vis.run(maze)
         else:

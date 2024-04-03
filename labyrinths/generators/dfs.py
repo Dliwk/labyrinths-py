@@ -3,11 +3,11 @@
 import random
 from typing import override
 
-from labyrinths.generators.generator import LabyrinthGenerator
-from labyrinths.labyrinth import LabyrinthData, WallKind
+from labyrinths.generators.generator import MazeGenerator
+from labyrinths.maze import MazeData, WallKind
 
 
-class DepthFirstSearchGenerator(LabyrinthGenerator):
+class DepthFirstSearchGenerator(MazeGenerator):
     """Generate mazes using depth first search."""
 
     def __init__(self, columns: int, rows: int):
@@ -29,7 +29,7 @@ class DepthFirstSearchGenerator(LabyrinthGenerator):
                 self.visit(x + dx, y + dy)
 
     @override
-    def generate(self) -> LabyrinthData:
+    def generate(self) -> MazeData:
         """Generate maze."""
         self.visited = [[False for _ in range(self.rows)] for _ in range(self.columns)]
         self.visit(self.columns // 2, self.rows // 2)

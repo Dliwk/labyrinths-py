@@ -1,20 +1,20 @@
 """Module with base class for generators."""
 
-from labyrinths.labyrinth import Cell, CellKind, LabyrinthData, WallKind
+from labyrinths.maze import Cell, CellKind, MazeData, WallKind
 
 
-class LabyrinthGenerator:
+class MazeGenerator:
     """Basic class for generating mazes."""
 
     def __init__(self, columns: int, rows: int) -> None:
         self.columns = columns
         self.rows = rows
-        self.current: LabyrinthData = self.get_filled_maze(columns, rows)
+        self.current: MazeData = self.get_filled_maze(columns, rows)
 
     @classmethod
-    def get_empty_maze(cls, columns: int, rows: int) -> LabyrinthData:
+    def get_empty_maze(cls, columns: int, rows: int) -> MazeData:
         """Gen dummy maze without any walls."""
-        data = LabyrinthData(
+        data = MazeData(
             columns,
             rows,
             [
@@ -40,9 +40,9 @@ class LabyrinthGenerator:
         return data
 
     @classmethod
-    def get_filled_maze(cls, columns: int, rows: int) -> LabyrinthData:
+    def get_filled_maze(cls, columns: int, rows: int) -> MazeData:
         """Get maze filled with walls."""
-        return LabyrinthData(
+        return MazeData(
             columns,
             rows,
             [
@@ -60,7 +60,7 @@ class LabyrinthGenerator:
             ],
         )
 
-    def generate(self) -> LabyrinthData:
+    def generate(self) -> MazeData:
         """Generate maze, virtual function."""
         raise NotImplementedError  # pragma: no cover
 
