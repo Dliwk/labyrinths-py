@@ -41,7 +41,7 @@ class MazeWidget(Widget):
             30,
             30,
             # fmt: off
-            text=("Use arrows keys to move.\n"
+            text=("Use arrow keys to move.\n"
                   "WASD to look around.\n"
                   "By default, mazes\n"
                   "are saved into\n"
