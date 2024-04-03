@@ -23,10 +23,10 @@ jobs:
 
     steps:
       - name: "Check out the repo"
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@master"
 
       - name: "Set up Python"
-        uses: "actions/setup-python@v2"
+        uses: "actions/setup-python@master"
         with:
           python-version: "${{ matrix.python-version }}"
 
@@ -39,7 +39,7 @@ jobs:
           python -m hatch run test:test
 
       - name: "Upload coverage data"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@master
         with:
           name: covdata
           path: coverage.xml
@@ -50,7 +50,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Check out the repo"
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@master"
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: covdata
 
       - uses: codecov/codecov-action@v4
         with:
