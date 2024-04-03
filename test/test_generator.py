@@ -1,7 +1,9 @@
 import pytest
+from generators_common import check_maze_has_solution
 
 from labyrinths.generators.generator import LabyrinthGenerator
 from labyrinths.labyrinth import LabyrinthData, WallKind
+from labyrinths.solver import NoSolution
 
 
 def check_maze_is_empty(maze: LabyrinthData) -> None:
@@ -23,3 +25,9 @@ def check_maze_is_empty(maze: LabyrinthData) -> None:
 def test_maze_empty(size: tuple[int, int]) -> None:
     maze = LabyrinthGenerator.get_empty_maze(*size)
     check_maze_is_empty(maze)
+
+
+def test_no_solution() -> None:
+    maze = LabyrinthGenerator.get_filled_maze(2, 3)
+    with pytest.raises(NoSolution):
+        check_maze_has_solution(maze)

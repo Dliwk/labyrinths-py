@@ -18,6 +18,7 @@ def load_from_dict(cls: type[T] | GenericAlias, data: dict | list | Any) -> T:
     annotations: dict[str, Any] | GenericAlias = cls.__annotations__ if hasattr(cls, "__annotations__") else cls
     cls = cls.__origin__ if hasattr(cls, "__origin__") else cls  # type: ignore
 
+    print(cls, type(cls))
     if dataclasses.is_dataclass(cls):
         kwargs = {}
         for name, annotation in annotations.items():
@@ -27,8 +28,8 @@ def load_from_dict(cls: type[T] | GenericAlias, data: dict | list | Any) -> T:
         return cls(data)
     elif issubclass(cls, list):
         return [load_from_dict(annotations.__args__[0], i) for i in data]
-    elif issubclass(cls, dict):
-        return {key: load_from_dict(annotations.__args__[1], value) for key, value in data.items()}
+    # elif issubclass(cls, dict):
+    #     return {key: load_from_dict(annotations.__args__[1], value) for key, value in data.items()}
     else:
         return cls(data)
 
@@ -44,8 +45,8 @@ def dump_to_dict(obj: Any) -> dict | Any:
         return obj.value
     elif isinstance(obj, list):
         return [dump_to_dict(i) for i in obj]
-    elif isinstance(obj, dict):
-        return {key: dump_to_dict(value) for key, value in obj.items()}
+    # elif isinstance(obj, dict):
+    #     return {key: dump_to_dict(value) for key, value in obj.items()}
     else:
         return obj
 
@@ -58,10 +59,3 @@ def load(cls: type[T], data: str) -> T:
 def dump(obj: Any) -> str:
     """Dump arbitrary object into a json string."""
     return json.dumps(dump_to_dict(obj))
-
-
-def transposed(lst: list[list[T]]) -> list[list[T]]:
-    """Transpose a two-dimensional list."""
-    if not lst:
-        return []
-    return [[lst[i][j] for i in range(len(lst))] for j in range(len(lst[0]))]

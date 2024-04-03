@@ -38,7 +38,7 @@ class Cell:
                 self.down = wallkind
             case (0, -1):
                 self.up = wallkind
-            case _:
+            case _:  # pragma: no cover
                 raise Exception
 
     def get_wall_at(self, dx: int, dy: int) -> WallKind:
@@ -52,7 +52,7 @@ class Cell:
                 return self.down
             case (0, -1):
                 return self.up
-            case _:
+            case _:  # pragma: no cover
                 raise Exception
 
 
