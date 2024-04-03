@@ -23,7 +23,8 @@ class Widget(abc.ABC):
         self.hidden = False
 
     @abstractmethod
-    def render(self) -> None: ...
+    def render(self) -> None:
+        ...
 
     def hide(self):
         self.hidden = True
@@ -70,10 +71,9 @@ class Widget(abc.ABC):
         if 0 <= x < self.width and 0 <= y < self.height:
             for child in reversed(self.children):
                 if child.on_mouse_click_check(x - child.coordinates[0], y - child.coordinates[1]):
-                    break
-            else:
-                self.on_mouse_left_click()
-                return True
+                    return True
+            self.on_mouse_left_click()
+            return True
         return False
 
 
