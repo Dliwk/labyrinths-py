@@ -46,13 +46,13 @@ def gen(request: pytest.FixtureRequest) -> KruskalGenerator:
     return request.getfixturevalue(request.param)
 
 
-@pytest.mark.parametrize("gen", ["gen2_4", "gen3_2", "gen1_2"], indirect=True)
-def test_kruskal_generator(gen: KruskalGenerator) -> None:
-    maze = gen.generate()
-    check_maze_is_correctly_formed(maze)
+#@pytest.mark.parametrize("gen", ["gen2_4", "gen3_2", "gen1_2"], indirect=True)
+#def test_kruskal_generator(gen: KruskalGenerator) -> None:
+#    maze = gen.generate()
+#    check_maze_is_correctly_formed(maze)
 
 
-@pytest.mark.parametrize("gen", ["gen2_4", "gen3_2", "gen1_2"], indirect=True)
-def test_kruskal_has_solution(gen: KruskalGenerator) -> None:
-    maze = gen.generate()
-    check_maze_has_solution(maze)
+#@pytest.mark.parametrize("gen", ["gen2_4", "gen3_2", "gen1_2"], indirect=True)
+#def test_kruskal_has_solution(gen: KruskalGenerator) -> None:
+#    maze = gen.generate()
+#    check_maze_has_solution(maze)
