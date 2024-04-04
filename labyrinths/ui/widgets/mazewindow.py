@@ -20,12 +20,10 @@ class MazeWidget(Widget):
 
     def __init__(self, parent: Widget, width: int, height: int, x: int, y: int) -> None:
         super().__init__(parent, width, height, x, y)
-        self.cellsize = 20
-        self.wallwidth = 1
-        self.solution_line_width = 4
+        self.scale = 1.0
 
         self.current_maze: MazeData | None = None
-        self.maze_viewport = (-self.cellsize * 3, -self.cellsize * 3)
+        self.maze_real_viewport = (-self.cellsize * 3.0, -self.cellsize * 3.0)
         self.solution: Solution | None = None
         self.generators = [
             (KruskalGenerator, "Kruskal MST"),
@@ -44,6 +42,7 @@ class MazeWidget(Widget):
             # fmt: off
             text=("Use arrow keys to move.\n"
                   "WASD or left-click&drag to look around.\n"
+                  "Mouse scrolling is supported.\n"
                   "By default, mazes\n"
                   "are saved to\n"
                   "maze.json.gz"),
@@ -63,6 +62,18 @@ class MazeWidget(Widget):
         self.next_gen()
 
         self.player_coordinates = (0, 0)
+
+    @property
+    def cellsize(self) -> int:
+        return int(20 * self.scale)
+
+    @property
+    def wallwidth(self) -> int:
+        return max(1, int(1 * self.scale))
+
+    @property
+    def solution_line_width(self) -> int:
+        return max(1, int(4 * self.scale))
 
     def next_gen(self):
         """Select next generator."""
@@ -130,11 +141,11 @@ class MazeWidget(Widget):
 
     def scale_up(self):
         """Scale up the maze."""
-        self.cellsize += 1
+        self.scale_maze(3)
 
     def scale_down(self):
         """Scale down the maze."""
-        self.cellsize -= 1
+        self.scale_maze(-3)
 
     def try_move_player(self, dx: int, dy: int) -> None:
         """Try to move player at given direction"""
@@ -151,13 +162,13 @@ class MazeWidget(Widget):
     def on_keydown(self, key: int) -> None:
         match key:
             case pygame.K_a:
-                self.maze_viewport = self.maze_viewport[0] - self.cellsize, self.maze_viewport[1]
+                self.maze_real_viewport = self.maze_real_viewport[0] - self.cellsize, self.maze_real_viewport[1]
             case pygame.K_d:
-                self.maze_viewport = self.maze_viewport[0] + self.cellsize, self.maze_viewport[1]
+                self.maze_real_viewport = self.maze_real_viewport[0] + self.cellsize, self.maze_real_viewport[1]
             case pygame.K_w:
-                self.maze_viewport = self.maze_viewport[0], self.maze_viewport[1] - self.cellsize
+                self.maze_real_viewport = self.maze_real_viewport[0], self.maze_real_viewport[1] - self.cellsize
             case pygame.K_s:
-                self.maze_viewport = self.maze_viewport[0], self.maze_viewport[1] + self.cellsize
+                self.maze_real_viewport = self.maze_real_viewport[0], self.maze_real_viewport[1] + self.cellsize
             case pygame.K_o:
                 self.scale_up()
             case pygame.K_p:
@@ -179,8 +190,24 @@ class MazeWidget(Widget):
 
     def on_mouse_motion(self, dx: int, dy: int) -> None:
         if self.mouse_pressed:
-            x, y = self.maze_viewport
-            self.maze_viewport = x - dx, y - dy
+            x, y = self.maze_real_viewport
+            self.maze_real_viewport = x - dx, y - dy
+
+    @property
+    def maze_viewport(self) -> tuple[int, int]:
+        return int(self.maze_real_viewport[0]), int(self.maze_real_viewport[1])
+
+    def scale_maze(self, amplitude: float) -> None:
+        multiplier = pow(1.03, amplitude)
+        self.scale *= multiplier
+        x, y = self.maze_real_viewport
+        # xoffset, yoffset = self.width / (2 * self.cellsize), self.height / (2 * self.cellsize)
+        self.maze_real_viewport = (x * multiplier + self.width / 2 * (multiplier - 1)), (
+            y * multiplier + self.height / 2 * (multiplier - 1)
+        )
+
+    def on_mouse_wheel(self, wheel: int) -> None:
+        self.scale_maze(wheel)
 
     def draw_maze(self) -> None:
         maze = self.current_maze

@@ -92,6 +92,9 @@ class Widget(abc.ABC):
     def on_mouse_motion(self, dx: int, dy: int) -> None:
         pass
 
+    def on_mouse_wheel(self, wheel: int) -> None:
+        pass
+
     def get_widget_at(self, x: int, y: int) -> weakref.ref[Widget] | None:
         if self.hidden:
             return None
@@ -165,6 +168,9 @@ class MainWindow:
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int) -> None:
         self.widget_action(x, y, lambda this, dx2, dy2: this.on_mouse_motion(dx2, dy2), dx, dy)
 
+    def on_mouse_wheel(self, x: int, y: int, wheel: int) -> None:
+        self.widget_action(x, y, lambda this: this.on_mouse_wheel(wheel))
+
     def run(self) -> None:
         """Run the event loop."""
 
@@ -193,6 +199,9 @@ class MainWindow:
                     case pygame.MOUSEMOTION:
                         self.on_mouse_hover(*event.pos)
                         self.on_mouse_motion(*event.pos, *event.rel)
+                    case pygame.MOUSEWHEEL:
+                        pos: tuple[int, int] = pygame.mouse.get_pos()
+                        self.on_mouse_wheel(*pos, event.y)
             self.render()
             pygame.display.flip()
 
