@@ -5,19 +5,20 @@
 [![codecov](https://codecov.io/github/Dliwk/labyrinths-py/branch/dev/graph/badge.svg?token=XadHp4cYfA)](https://codecov.io/github/Dliwk/labyrinths-py)
 
 ## Запуск
-1. Установка `hatch`. Обычно есть в репозиториях любого дистрибутива Linux, но можно и поставить через pip:
+1. Требует Python `>= 3.10`
+2. Установка `hatch`. Обычно есть в репозиториях любого дистрибутива Linux, но можно и поставить через pip:
     ```bash
     pip install hatch
     ```
-2. Переход в окружение проекта:
+3. Переход в окружение проекта:
     ```bash
     hatch shell
     ```
-3. Запуск:
+4. Запуск:
     ```bash
     python -m labyrinths -v
     ```
-4. Тесты можно запустить через
+5. Тесты можно запустить через
     ```bash
    hatch run test:test
     ```

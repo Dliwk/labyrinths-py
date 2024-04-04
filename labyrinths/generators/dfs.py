@@ -1,7 +1,8 @@
 """Generate mazes using depth first search algorithm."""
 
 import random
-from typing import override
+
+from typing_extensions import override
 
 from labyrinths.generators.generator import MazeGenerator
 from labyrinths.maze import MazeData, WallKind
