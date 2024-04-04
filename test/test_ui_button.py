@@ -19,22 +19,22 @@ def test_button_click(pygame_headless) -> None:
     mainwindow = MainWindow(800, 600)
     Button(mainwindow.root_widget, 40, 40, 80, 80, callback)
 
-    mainwindow.on_mouse_left_click(80, 80)
+    mainwindow.on_mouse_left_button_down(80, 80)
     assert callback.call_count == 1
 
-    mainwindow.on_mouse_left_click(120, 100)
+    mainwindow.on_mouse_left_button_down(120, 100)
     assert callback.call_count == 1
 
-    mainwindow.on_mouse_left_click(100, 120)
+    mainwindow.on_mouse_left_button_down(100, 120)
     assert callback.call_count == 1
 
-    mainwindow.on_mouse_left_click(100, 100)
+    mainwindow.on_mouse_left_button_down(100, 100)
     assert callback.call_count == 2
 
-    mainwindow.on_mouse_left_click(100, 20)
+    mainwindow.on_mouse_left_button_down(100, 20)
     assert callback.call_count == 2
 
-    mainwindow.on_mouse_left_click(20, 100)
+    mainwindow.on_mouse_left_button_down(20, 100)
     assert callback.call_count == 2
 
 
@@ -59,14 +59,14 @@ def test_overlapping_buttons(pygame_headless) -> None:
     # 55..65
     Button(mainwindow.root_widget, 10, 10, 55, 55, callback3)
 
-    mainwindow.on_mouse_left_click(60, 60)
+    mainwindow.on_mouse_left_button_down(60, 60)
     assert call_counts() == (0, 0, 1)
 
-    mainwindow.on_mouse_left_click(50, 50)
+    mainwindow.on_mouse_left_button_down(50, 50)
     assert call_counts() == (0, 1, 1)
 
-    mainwindow.on_mouse_left_click(67, 67)
+    mainwindow.on_mouse_left_button_down(67, 67)
     assert call_counts() == (0, 2, 1)
 
-    mainwindow.on_mouse_left_click(45, 45)
+    mainwindow.on_mouse_left_button_down(45, 45)
     assert call_counts() == (1, 2, 1)

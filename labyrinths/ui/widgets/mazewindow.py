@@ -27,28 +27,29 @@ class MazeWidget(Widget):
         self.current_maze: MazeData | None = None
         self.maze_viewport = (-self.cellsize * 3, -self.cellsize * 3)
         self.solution: Solution | None = None
-
         self.generators = [
             (KruskalGenerator, "Kruskal MST"),
             (DepthFirstSearchGenerator, "DFS"),
         ]
         self.gen_id = 0
 
+        self.mouse_pressed = False
+
         self.help_widget = TextLabel(
             self,
-            300,
-            300,
+            400,
+            200,
             30,
             30,
             # fmt: off
             text=("Use arrow keys to move.\n"
-                  "WASD to look around.\n"
+                  "WASD or left-click&drag to look around.\n"
                   "By default, mazes\n"
-                  "are saved into\n"
+                  "are saved to\n"
                   "maze.json.gz"),
             # fmt: on
         )
-        self.help_widget.hide()
+        # self.help_widget.hide()
 
         Button(self, 100, 30, 0, self.height - 30, onclick=self.new_maze, text="new maze")
         self.next_gen_button = Button(self, 120, 30, 0, self.height - 60, onclick=self.next_gen, text="")
@@ -57,7 +58,7 @@ class MazeWidget(Widget):
         Button(self, 30, 30, self.width - 60, 0, onclick=self.scale_down, text="-")
         Button(self, 60, 30, self.width - 60, self.height // 2, onclick=self.save_maze, text="save")
         Button(self, 60, 30, self.width - 60, self.height // 2 - 30, onclick=self.load_maze, text="load")
-        Button(self, 30, 30, 0, 0, onclick=self.toggle_help, text="?")
+        self.help_button = Button(self, 30, 30, 0, 0, onclick=self.toggle_help, text="x")
 
         self.next_gen()
 
@@ -72,7 +73,12 @@ class MazeWidget(Widget):
 
     def toggle_help(self):
         """Show/hide help message."""
-        self.help_widget.toggle()
+        if self.help_widget.hidden:
+            self.help_widget.show()
+            self.help_button.text = "x"
+        else:
+            self.help_widget.hide()
+            self.help_button.text = "?"
 
     def new_maze(self) -> None:
         """Generate new maze."""
@@ -164,6 +170,17 @@ class MazeWidget(Widget):
                 self.try_move_player(0, 1)
             case pygame.K_RIGHT:
                 self.try_move_player(1, 0)
+
+    def on_mouse_left_button_down(self) -> None:
+        self.mouse_pressed = True
+
+    def on_mouse_left_button_up(self) -> None:
+        self.mouse_pressed = False
+
+    def on_mouse_motion(self, dx: int, dy: int) -> None:
+        if self.mouse_pressed:
+            x, y = self.maze_viewport
+            self.maze_viewport = x - dx, y - dy
 
     def draw_maze(self) -> None:
         maze = self.current_maze

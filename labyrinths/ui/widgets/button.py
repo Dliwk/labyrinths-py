@@ -28,7 +28,7 @@ class Button(TextLabel):
         self.normal_color = color
         self.hovered_color = hovered_color
 
-    def on_mouse_left_click(self) -> None:
+    def on_mouse_left_button_down(self) -> None:
         self.onclick()
 
     def on_mouse_hover(self) -> None:

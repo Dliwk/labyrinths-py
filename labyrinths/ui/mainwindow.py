@@ -7,6 +7,7 @@ import enum
 import sys
 import weakref
 from abc import abstractmethod
+from typing import Any, Callable
 
 import pygame
 
@@ -70,7 +71,10 @@ class Widget(abc.ABC):
         if self.parent:
             self.parent.children.remove(self)
 
-    def on_mouse_left_click(self) -> None:
+    def on_mouse_left_button_down(self) -> None:
+        pass
+
+    def on_mouse_left_button_up(self) -> None:
         pass
 
     def on_mouse_hover(self) -> None:
@@ -79,7 +83,13 @@ class Widget(abc.ABC):
     def on_mouse_hover_end(self) -> None:
         pass
 
-    def on_mouse_right_click(self) -> None:
+    def on_mouse_right_button_down(self) -> None:
+        pass
+
+    def on_mouse_right_button_up(self) -> None:
+        pass
+
+    def on_mouse_motion(self, dx: int, dy: int) -> None:
         pass
 
     def get_widget_at(self, x: int, y: int) -> weakref.ref[Widget] | None:
@@ -118,23 +128,14 @@ class MainWindow:
         """Render everything."""
         self.root_widget.render_self_and_children(self.screen, (0, 0))
 
-    def on_mouse_left_click(self, x: int, y: int) -> None:
+    def widget_action(self, x: int, y: int, action: Callable, *args, **kwargs) -> None:
         ref = self.root_widget.get_widget_at(x, y)
         if ref is None:
             return
         result = ref()
         if result is None:
             return
-        result.on_mouse_left_click()
-
-    def on_mouse_right_click(self, x: int, y: int) -> None:
-        ref = self.root_widget.get_widget_at(x, y)
-        if ref is None:
-            return
-        result = ref()
-        if result is None:
-            return
-        result.on_mouse_right_click()
+        action(result, *args, **kwargs)
 
     def on_mouse_hover(self, x: int, y: int) -> None:
         result = self.root_widget.get_widget_at(x, y)
@@ -148,6 +149,21 @@ class MainWindow:
                 if widget:
                     widget.on_mouse_hover()
             self.hovered_widget = result
+
+    def on_mouse_left_button_down(self, x: int, y: int) -> None:
+        self.widget_action(x, y, lambda this: this.on_mouse_left_button_down())
+
+    def on_mouse_right_button_down(self, x: int, y: int) -> None:
+        self.widget_action(x, y, lambda this: this.on_mouse_right_button_down())
+
+    def on_mouse_left_button_up(self, x: int, y: int) -> None:
+        self.widget_action(x, y, lambda this: this.on_mouse_left_button_up())
+
+    def on_mouse_right_button_up(self, x: int, y: int) -> None:
+        self.widget_action(x, y, lambda this: this.on_mouse_right_button_up())
+
+    def on_mouse_motion(self, x: int, y: int, dx: int, dy: int) -> None:
+        self.widget_action(x, y, lambda this, dx2, dy2: this.on_mouse_motion(dx2, dy2), dx, dy)
 
     def run(self) -> None:
         """Run the event loop."""
@@ -166,11 +182,17 @@ class MainWindow:
                         self.root_widget.on_keyup_propagate(event.key)
                     case pygame.MOUSEBUTTONDOWN:
                         if event.button == 1:
-                            self.on_mouse_left_click(*event.pos)
+                            self.on_mouse_left_button_down(*event.pos)
                         elif event.button == 2:
-                            self.on_mouse_right_click(*event.pos)
+                            self.on_mouse_right_button_down(*event.pos)
+                    case pygame.MOUSEBUTTONUP:
+                        if event.button == 1:
+                            self.on_mouse_left_button_up(*event.pos)
+                        elif event.button == 2:
+                            self.on_mouse_right_button_up(*event.pos)
                     case pygame.MOUSEMOTION:
                         self.on_mouse_hover(*event.pos)
+                        self.on_mouse_motion(*event.pos, *event.rel)
             self.render()
             pygame.display.flip()
 

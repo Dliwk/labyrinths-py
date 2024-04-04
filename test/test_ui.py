@@ -50,27 +50,27 @@ def test_keyup(mocker, pygame_headless) -> None:
 def test_mouse_click(mocker, pygame_headless) -> None:
     mainwindow = MainWindow(800, 600)
     widget = EmptyWidget(mainwindow.root_widget, 30, 40, 10, 20)
-    spy = mocker.spy(widget, "on_mouse_left_click")
+    spy = mocker.spy(widget, "on_mouse_left_button_down")
 
-    mainwindow.on_mouse_left_click(9, 19)
+    mainwindow.on_mouse_left_button_down(9, 19)
     assert spy.call_count == 0
 
-    mainwindow.on_mouse_left_click(10, 20)
+    mainwindow.on_mouse_left_button_down(10, 20)
     assert spy.call_count == 1
 
-    mainwindow.on_mouse_left_click(20, 30)
+    mainwindow.on_mouse_left_button_down(20, 30)
     assert spy.call_count == 2
 
-    mainwindow.on_mouse_left_click(0, 80)
+    mainwindow.on_mouse_left_button_down(0, 80)
     assert spy.call_count == 2
 
-    mainwindow.on_mouse_left_click(90, 0)
+    mainwindow.on_mouse_left_button_down(90, 0)
     assert spy.call_count == 2
 
-    mainwindow.on_mouse_left_click(40, 50)
+    mainwindow.on_mouse_left_button_down(40, 50)
     assert spy.call_count == 2
 
-    mainwindow.on_mouse_left_click(30, 60)
+    mainwindow.on_mouse_left_button_down(30, 60)
     assert spy.call_count == 2
 
 
