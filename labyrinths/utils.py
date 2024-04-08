@@ -27,8 +27,6 @@ def load_from_dict(cls: type[T] | GenericAlias, data: dict | list | Any) -> T:
         return cls(data)
     elif issubclass(cls, list):
         return [load_from_dict(annotations.__args__[0], i) for i in data]
-    # elif issubclass(cls, dict):
-    #     return {key: load_from_dict(annotations.__args__[1], value) for key, value in data.items()}
     else:
         return cls(data)
 
@@ -44,8 +42,6 @@ def dump_to_dict(obj: Any) -> dict | Any:
         return obj.value
     elif isinstance(obj, list):
         return [dump_to_dict(i) for i in obj]
-    # elif isinstance(obj, dict):
-    #     return {key: dump_to_dict(value) for key, value in obj.items()}
     else:
         return obj
 

@@ -101,7 +101,7 @@ class Widget(abc.ABC):
         if 0 <= x < self.width and 0 <= y < self.height:
             for child in reversed(self.children):
                 result = child.get_widget_at(x - child.coordinates[0], y - child.coordinates[1])
-                if result is not None:
+                if result:
                     return result
             return weakref.ref(self)
         return None
@@ -133,7 +133,7 @@ class MainWindow:
 
     def widget_action(self, x: int, y: int, action: Callable, *args, **kwargs) -> None:
         ref = self.root_widget.get_widget_at(x, y)
-        if ref is None:
+        if not ref:
             return
         result = ref()
         if result is None:
@@ -143,13 +143,13 @@ class MainWindow:
     def on_mouse_hover(self, x: int, y: int) -> None:
         result = self.root_widget.get_widget_at(x, y)
         if result != self.hovered_widget:
-            if self.hovered_widget is not None:
+            if self.hovered_widget:
                 widget = self.hovered_widget()
-                if widget:
+                if widget is not None:
                     widget.on_mouse_hover_end()
-            if result is not None:
+            if result:
                 widget = result()
-                if widget:
+                if widget is not None:
                     widget.on_mouse_hover()
             self.hovered_widget = result
 
