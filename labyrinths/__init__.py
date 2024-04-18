@@ -1,0 +1,1 @@
+"""Labyrinths package."""
