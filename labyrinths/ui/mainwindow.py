@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 import abc
-import enum
 import sys
 import weakref
 from abc import abstractmethod
-from typing import Any, Callable
+from typing import Callable
 
 import pygame
 

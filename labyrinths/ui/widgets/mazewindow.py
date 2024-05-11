@@ -8,8 +8,11 @@ from pygame import draw
 from labyrinths.generators.dfs import DepthFirstSearchGenerator
 from labyrinths.generators.kruskal import KruskalGenerator
 from labyrinths.maze import MazeData, WallKind
+
+# FIXME: move these outta here
 from labyrinths.mazeloader import dump_maze, load_maze
 from labyrinths.solver import MazeSolver, Solution
+
 from labyrinths.ui import Widget
 from labyrinths.ui.widgets.button import Button
 from labyrinths.ui.widgets.label import TextLabel
@@ -203,7 +206,7 @@ class MazeWidget(Widget):
         x, y = self.maze_real_viewport
         # xoffset, yoffset = self.width / (2 * self.cellsize), self.height / (2 * self.cellsize)
         self.maze_real_viewport = (x * multiplier + self.width / 2 * (multiplier - 1)), (
-            y * multiplier + self.height / 2 * (multiplier - 1)
+                y * multiplier + self.height / 2 * (multiplier - 1)
         )
 
     def on_mouse_wheel(self, wheel: int) -> None:
