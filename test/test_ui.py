@@ -25,9 +25,9 @@ def test_keydown(mocker, pygame_headless) -> None:
 
     mainwindow.root_widget.on_keydown_propagate(pygame.K_a, pygame.Event(pygame.KEYDOWN))
 
-    spy1.assert_called_once_with(pygame.K_a)
-    spy2.assert_called_once_with(pygame.K_a)
-    spy3.assert_called_once_with(pygame.K_a)
+    spy1.assert_called_once_with(pygame.K_a, pygame.Event(pygame.KEYDOWN))
+    spy2.assert_called_once_with(pygame.K_a, pygame.Event(pygame.KEYDOWN))
+    spy3.assert_called_once_with(pygame.K_a, pygame.Event(pygame.KEYDOWN))
 
 
 def test_keyup(mocker, pygame_headless) -> None:
