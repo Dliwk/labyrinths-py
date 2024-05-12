@@ -1,7 +1,6 @@
 """Minimum spanning tree based labyrinth generator."""
 
 import random
-import sys
 from dataclasses import dataclass
 
 from typing_extensions import override

@@ -11,7 +11,6 @@ from labyrinths.session.hostsession import HostSession
 from labyrinths.ui import Widget
 from labyrinths.ui.widgets.adminpanel import AdminPanel
 from labyrinths.ui.widgets.button import Button
-from labyrinths.ui.widgets.chat import ChatWidget
 from labyrinths.ui.widgets.connectmenu import ConnectMenu
 from labyrinths.ui.widgets.container import Container
 from labyrinths.ui.widgets.label import TextLabel
@@ -21,20 +20,22 @@ class MainMenu(Container):
     """Simple Main Menu."""
 
     def __init__(
-        self,
-        parent: Widget,
-        width: int,
-        height: int,
-        x: int,
-        y: int,
-        message: str = "",
+            self,
+            parent: Widget,
+            width: int,
+            height: int,
+            x: int,
+            y: int,
+            message: str = "",
     ) -> None:
         super().__init__(parent, width, height, x, y)
         TextLabel(
             self, 300, 50, width // 2 - 150, 80, text="Main menu", color=(0, 0, 0), text_color=(0, 255, 0), fontsize=64
         )
-        Button(self, 80, 30, width // 2 - 40, height // 2 - 60, text="host", onclick=self.host_server)
-        Button(self, 80, 30, width // 2 - 40, height // 2 - 20, text="connect", onclick=self.show_connect_menu)
+        self.host_button = Button(self, 80, 30, width // 2 - 40, height // 2 - 60, text="host",
+                                  onclick=self.host_server)
+        self.show_connect_menu_button = Button(self, 80, 30, width // 2 - 40, height // 2 - 20, text="connect",
+                                               onclick=self.show_connect_menu)
 
         TextLabel(
             self,
@@ -51,8 +52,9 @@ class MainMenu(Container):
     def show_connect_menu(self):
         ConnectMenu(self, self.width, self.height, 0, 0)
 
-    def host_server(self) -> None:
-        port = random.randint(10000, 20000)
+    def host_server(self, port: int | None = None) -> None:
+        if port is None:
+            port = random.randint(10000, 20000)
 
         # Spin up internal server.
         host = HostConnectionSet("0.0.0.0", port)

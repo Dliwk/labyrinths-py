@@ -74,7 +74,7 @@ def test_mouse_click(mocker, pygame_headless) -> None:
     assert spy.call_count == 2
 
 
-def test_widget_closure(mocker, pygame_headless) -> None:
+def test_widget_closure(pygame_headless) -> None:
     mainwindow = MainWindow(800, 600)
     widget1 = EmptyWidget(mainwindow.root_widget, 30, 40, 10, 20)
     widget2 = EmptyWidget(widget1, 10, 20, 0, 0)

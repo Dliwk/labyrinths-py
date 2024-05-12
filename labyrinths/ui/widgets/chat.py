@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable, Tuple
+from typing import TYPE_CHECKING, Tuple
 
 import pygame
 from typing_extensions import override
