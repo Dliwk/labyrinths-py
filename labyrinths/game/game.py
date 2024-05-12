@@ -3,6 +3,7 @@
 import logging
 from typing import Tuple
 
+from labyrinths.generators.dfs import DepthFirstSearchGenerator
 from labyrinths.generators.kruskal import KruskalGenerator
 from labyrinths.maze import MazeData, WallKind
 from labyrinths.session.types import Player
@@ -13,8 +14,15 @@ logger = logging.getLogger(__name__)
 class Game:
     """Handles the game logic."""
 
-    def __init__(self, w: int, h: int):
-        gen = KruskalGenerator(w, h)
+    def __init__(self, w: int, h: int, algo: str):
+        match algo:
+            case "kruskal":
+                genclass = KruskalGenerator
+            case "dfs":
+                genclass = DepthFirstSearchGenerator
+            case _:
+                raise ValueError(f"Unknown algo {algo}")
+        gen = genclass(w, h)
         self.maze: MazeData = gen.generate()
         self.players: dict[int, Player] = {}
         self.winner_id: int | None = None

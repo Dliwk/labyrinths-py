@@ -21,7 +21,7 @@ class HostSession:
 
     def handle_admin_command(self, command: str, data: dict) -> None:
         if command == "new_game":
-            self.game = Game(data["w"], data["h"])
+            self.game = Game(data["w"], data["h"], data.get("algo", "kruskal"))
             self.conn_set.broadcast("game.new", {"maze": utils.dump_to_dict(self.game.maze)})
             for client_id, client in self.clients.items():
                 player = Player(self.clients[client_id], 0, 0)

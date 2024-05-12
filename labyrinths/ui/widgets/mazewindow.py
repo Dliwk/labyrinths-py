@@ -183,7 +183,7 @@ class MazeWidget(Widget):
         x, y = self.maze_real_viewport
         # xoffset, yoffset = self.width / (2 * self.cellsize), self.height / (2 * self.cellsize)
         self.maze_real_viewport = (x * multiplier + self.width / 2 * (multiplier - 1)), (
-                y * multiplier + self.height / 2 * (multiplier - 1)
+            y * multiplier + self.height / 2 * (multiplier - 1)
         )
 
     def on_mouse_wheel(self, wheel: int) -> None:
