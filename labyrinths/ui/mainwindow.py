@@ -38,16 +38,16 @@ class Widget(abc.ABC):
     def toggle(self) -> None:
         self.hidden = not self.hidden
 
-    def on_keydown(self, key: int) -> None:
+    def on_keydown(self, key: int, event: pygame.Event) -> None:
         pass
 
     def on_keyup(self, key: int) -> None:
         pass
 
-    def on_keydown_propagate(self, key: int) -> None:
-        self.on_keydown(key)
+    def on_keydown_propagate(self, key: int, event: pygame.Event) -> None:
+        self.on_keydown(key, event)
         for child in self.children:
-            child.on_keydown_propagate(key)
+            child.on_keydown_propagate(key, event)
 
     def on_keyup_propagate(self, key: int) -> None:
         self.on_keyup(key)
@@ -182,7 +182,7 @@ class MainWindow:
                         pygame.quit()
                         sys.exit()
                     case pygame.KEYDOWN:
-                        self.root_widget.on_keydown_propagate(event.key)
+                        self.root_widget.on_keydown_propagate(event.key, event)
                     case pygame.KEYUP:
                         self.root_widget.on_keyup_propagate(event.key)
                     case pygame.MOUSEBUTTONDOWN:
