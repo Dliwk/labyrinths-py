@@ -15,6 +15,7 @@ class Game:
     """Handles the game logic."""
 
     def __init__(self, w: int, h: int, algo: str):
+        genclass: type
         match algo:
             case "kruskal":
                 genclass = KruskalGenerator
@@ -43,7 +44,7 @@ class Game:
             case _:
                 raise ValueError(f"Invalid direction: {direction}")
         if self.maze.field[x][y].get_wall_at(dx, dy) == WallKind.WALL:
-            return
+            return None
 
         player.x += dx
         player.y += dy

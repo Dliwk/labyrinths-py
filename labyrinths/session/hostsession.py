@@ -74,6 +74,7 @@ class HostSession:
                     self.conn_set.broadcast("game.new_player", {"id": client_id, "x": player.x, "y": player.y})
 
             case "session.client.disconnect":
+                assert self.game
                 if client_id in self.clients.keys():
                     self.clients.pop(client_id)
                     self.conn_set.broadcast("session.client_disconnected", {"id": client_id})
@@ -82,6 +83,7 @@ class HostSession:
                         self.conn_set.broadcast("game.remove_player", {"id": client_id})
 
             case "game.client.movement":
+                assert self.game
                 result = self.game.handle_movement(client_id, data["dir"])
                 if result is not None:
                     self.conn_set.broadcast("game.movement", {"id": client_id, "x": result[0], "y": result[1]})

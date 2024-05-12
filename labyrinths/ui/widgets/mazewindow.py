@@ -58,7 +58,7 @@ class MazeWidget(Widget):
         Button(self, 30, 30, self.width - 30, 0, onclick=self.scale_up, text="+")
         Button(self, 30, 30, self.width - 60, 0, onclick=self.scale_down, text="-")
 
-        self.players: dict[int, Player] | None = None
+        self.players: dict[int, Player] = {}
 
         self.solution: Solution | None = None
         self.winner_name: str | None = None
@@ -246,6 +246,7 @@ class MazeWidget(Widget):
             self.surface.blit(rendered_text, (x - xsize // 2, y - self.cellsize - ysize // 2))
 
     def draw_winner(self) -> None:
+        assert self.winner_color is not None
         rendered_text = self.announcement_font.render(f"{self.winner_name} wins", True, self.winner_color)
         xsize, ysize = rendered_text.get_size()
         self.surface.blit(rendered_text, (self.width // 2 - xsize // 2, 100))

@@ -56,6 +56,8 @@ class ConnectMenu(Container):
     def connect(self) -> None:
         try:
             connection = ClientToHostConnection(self.host_input.text, int(self.port_input.text))
+            assert self.parent is not None
+            assert self.parent.parent is not None
             client_session = ClientSession(connection, self.parent.parent)
             client_session.name = self.name_input.text
 

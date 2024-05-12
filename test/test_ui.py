@@ -23,7 +23,7 @@ def test_keydown(mocker, pygame_headless) -> None:
     spy2 = mocker.spy(widget2, "on_keydown")
     spy3 = mocker.spy(widget3, "on_keydown")
 
-    mainwindow.root_widget.on_keydown_propagate(pygame.K_a)
+    mainwindow.root_widget.on_keydown_propagate(pygame.K_a, pygame.Event(pygame.KEYDOWN))
 
     spy1.assert_called_once_with(pygame.K_a)
     spy2.assert_called_once_with(pygame.K_a)

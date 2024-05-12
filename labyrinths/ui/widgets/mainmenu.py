@@ -66,6 +66,7 @@ class MainMenu(Container):
         Thread(target=run_server, daemon=True).start()
 
         # Connect to it.
+        assert self.parent is not None
         cont = Container(self.parent, self.parent.width, self.parent.height, 0, 0)
 
         connection = ClientToHostConnection("127.0.0.1", port)

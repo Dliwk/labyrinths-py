@@ -77,6 +77,7 @@ class ClientSession:
                 self.maze_widget.winner_name = None
                 self.maze_widget.winner_color = None
                 self.maze = utils.load_from_dict(MazeData, data["maze"])
+                assert self.maze is not None
                 self.players.clear()
                 self.maze_widget.set_maze(self.maze)
                 self.maze_widget.set_players(self.players)
@@ -89,6 +90,7 @@ class ClientSession:
                 self.players = {
                     item["id"]: Player(self.clients[item["id"]], item["x"], item["y"]) for item in data["players"]
                 }
+                assert self.maze is not None
                 self.maze_widget.set_maze(self.maze)
                 self.maze_widget.set_players(self.players)
             case "game.end":

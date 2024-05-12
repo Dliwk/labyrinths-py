@@ -33,6 +33,8 @@ class ClientToHostConnection(Connection):
 
     @override
     def do_handle_packet(self, ptype: str, data: dict) -> None:
+        assert self.handler is not None
+
         if ptype == "connection.host.hello":
             if self.established:
                 raise ConnectionError("Got host hello twice.")
