@@ -1,4 +1,5 @@
 import coloredlogs
+
 from labyrinths.ui.mainwindow import MainWindow
 from labyrinths.ui.widgets.mainmenu import MainMenu
 

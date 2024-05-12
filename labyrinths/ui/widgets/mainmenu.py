@@ -20,22 +20,24 @@ class MainMenu(Container):
     """Simple Main Menu."""
 
     def __init__(
-            self,
-            parent: Widget,
-            width: int,
-            height: int,
-            x: int,
-            y: int,
-            message: str = "",
+        self,
+        parent: Widget,
+        width: int,
+        height: int,
+        x: int,
+        y: int,
+        message: str = "",
     ) -> None:
         super().__init__(parent, width, height, x, y)
         TextLabel(
             self, 300, 50, width // 2 - 150, 80, text="Main menu", color=(0, 0, 0), text_color=(0, 255, 0), fontsize=64
         )
-        self.host_button = Button(self, 80, 30, width // 2 - 40, height // 2 - 60, text="host",
-                                  onclick=self.host_server)
-        self.show_connect_menu_button = Button(self, 80, 30, width // 2 - 40, height // 2 - 20, text="connect",
-                                               onclick=self.show_connect_menu)
+        self.host_button = Button(
+            self, 80, 30, width // 2 - 40, height // 2 - 60, text="host", onclick=self.host_server
+        )
+        self.show_connect_menu_button = Button(
+            self, 80, 30, width // 2 - 40, height // 2 - 20, text="connect", onclick=self.show_connect_menu
+        )
 
         TextLabel(
             self,
