@@ -1,7 +1,5 @@
 """Simple Admin Panel."""
 
-from typing import Callable
-
 from labyrinths.session.clientsession import ClientSession
 from labyrinths.ui import Widget
 from labyrinths.ui.widgets.button import Button

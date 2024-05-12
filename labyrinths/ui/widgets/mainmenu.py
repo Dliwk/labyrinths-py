@@ -11,6 +11,7 @@ from labyrinths.session.hostsession import HostSession
 from labyrinths.ui import Widget
 from labyrinths.ui.widgets.adminpanel import AdminPanel
 from labyrinths.ui.widgets.button import Button
+from labyrinths.ui.widgets.chat import ChatWidget
 from labyrinths.ui.widgets.connectmenu import ConnectMenu
 from labyrinths.ui.widgets.container import Container
 from labyrinths.ui.widgets.label import TextLabel
@@ -20,13 +21,13 @@ class MainMenu(Container):
     """Simple Main Menu."""
 
     def __init__(
-        self,
-        parent: Widget,
-        width: int,
-        height: int,
-        x: int,
-        y: int,
-        message: str = "",
+            self,
+            parent: Widget,
+            width: int,
+            height: int,
+            x: int,
+            y: int,
+            message: str = "",
     ) -> None:
         super().__init__(parent, width, height, x, y)
         TextLabel(
@@ -65,8 +66,10 @@ class MainMenu(Container):
         Thread(target=run_server, daemon=True).start()
 
         # Connect to it.
+        cont = Container(self.parent, self.parent.width, self.parent.height, 0, 0)
+
         connection = ClientToHostConnection("127.0.0.1", port)
-        client_session = ClientSession(connection, self.parent)
+        client_session = ClientSession(connection, cont)
         host_session.admin_ids.append(1)
 
         def run_client() -> None:
@@ -77,10 +80,10 @@ class MainMenu(Container):
 
         Thread(target=run_client, daemon=True).start()
 
-        AdminPanel(self.parent, 50, 30, 0, self.height - 30, client_session)
+        AdminPanel(cont, 50, 30, self.width - 50, self.height - 60, client_session)
 
         TextLabel(
-            self.parent,
+            cont,
             100,
             30,
             self.width - 100,

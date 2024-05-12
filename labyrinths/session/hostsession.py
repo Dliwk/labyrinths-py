@@ -89,3 +89,6 @@ class HostSession:
                     self.game.ended = True
                     self.conn_set.broadcast("game.winner", {"id": self.game.winner_id})
                     self.conn_set.broadcast("game.show_solution", {})
+
+            case "game.client.chat":
+                self.conn_set.broadcast("game.chat", {"id": client_id, **data})

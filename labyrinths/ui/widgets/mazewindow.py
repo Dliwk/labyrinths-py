@@ -53,10 +53,10 @@ class MazeWidget(Widget):
             # fmt: on
         )
         self.help_widget.hide()
+        self.help_button = Button(self, 30, 30, 0, 0, onclick=self.toggle_help, text="?")
 
         Button(self, 30, 30, self.width - 30, 0, onclick=self.scale_up, text="+")
         Button(self, 30, 30, self.width - 60, 0, onclick=self.scale_down, text="-")
-        self.help_button = Button(self, 30, 30, 0, 0, onclick=self.toggle_help, text="x")
 
         self.players: dict[int, Player] | None = None
 
@@ -153,18 +153,6 @@ class MazeWidget(Widget):
 
     def on_keydown(self, key: int, event: pygame.Event) -> None:
         match key:
-            case pygame.K_a:
-                self.maze_real_viewport = self.maze_real_viewport[0] - self.cellsize, self.maze_real_viewport[1]
-            case pygame.K_d:
-                self.maze_real_viewport = self.maze_real_viewport[0] + self.cellsize, self.maze_real_viewport[1]
-            case pygame.K_w:
-                self.maze_real_viewport = self.maze_real_viewport[0], self.maze_real_viewport[1] - self.cellsize
-            case pygame.K_s:
-                self.maze_real_viewport = self.maze_real_viewport[0], self.maze_real_viewport[1] + self.cellsize
-            case pygame.K_o:
-                self.scale_up()
-            case pygame.K_p:
-                self.scale_down()
             case pygame.K_UP:
                 self.on_move_up()
             case pygame.K_LEFT:

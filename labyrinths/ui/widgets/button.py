@@ -23,7 +23,7 @@ class Button(TextLabel):
         text_color: tuple[int, int, int] = (0, 0, 0),
         fontsize: int = 25,
     ) -> None:
-        super().__init__(parent, width, height, x, y, text, color, text_color, fontsize)
+        super().__init__(parent, width, height, x, y, text, color, text_color, False, fontsize)
         self.onclick = onclick
         self.normal_color = color
         self.hovered_color = hovered_color

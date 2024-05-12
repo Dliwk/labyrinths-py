@@ -7,6 +7,8 @@ from labyrinths.connection.client import ClientToHostConnection
 from labyrinths.maze import MazeData
 from labyrinths.session.types import ClientInfo, Player
 from labyrinths.ui import Widget
+from labyrinths.ui.widgets.chat import ChatWidget
+from labyrinths.ui.widgets.container import Container
 from labyrinths.ui.widgets.mazewindow import MazeWidget
 
 
@@ -17,7 +19,9 @@ class ClientSession:
         self.conn = conn
         self.conn.set_handler(self.handle_packet)
         self.ui = widget
-        self.maze_widget = MazeWidget(self.ui, self.ui.width, self.ui.height, 0, 0)
+        self.maze_container = Container(self.ui, self.ui.width, self.ui.height, 0, 0)
+        self.chat_widget = ChatWidget(self.ui, 300, 200, 0, self.ui.height - 200, self.conn)
+        self.maze_widget = MazeWidget(self.maze_container, self.maze_container.width, self.maze_container.height, 0, 0)
         self.maze_widget.hide()
         self.maze_widget.on_move_up = self._move_up
         self.maze_widget.on_move_down = self._move_down
@@ -54,7 +58,9 @@ class ClientSession:
                 self.conn.send_packet("session.client.info", {"name": self.name})
             case "session.client_connected":
                 self.clients[data["id"]] = ClientInfo(data["name"], data["color"])
+                self.chat_widget.put('joined.', self.clients[data["id"]].name, self.clients[data["id"]].color)
             case "session.client_disconnected":
+                self.chat_widget.put('left.', self.clients[data["id"]].name, self.clients[data["id"]].color)
                 self.clients.pop(data["id"])
             case "session.sync_info":
                 self.clients = {item["id"]: ClientInfo(item["name"], item["color"]) for item in data["clients"]}
@@ -96,6 +102,8 @@ class ClientSession:
             case "game.movement":
                 self.players[data["id"]].x = data["x"]
                 self.players[data["id"]].y = data["y"]
+            case "game.chat":
+                self.chat_widget.put(data['message'], self.clients[data["id"]].name, self.clients[data["id"]].color)
 
     def admin_command(self, command: str, data: dict):
         self.conn.send_packet(f"admin.{command}", data)
