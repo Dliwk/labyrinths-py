@@ -67,10 +67,16 @@ class ClientSession:
                     MainMenu(self.ui, self.ui.width, self.ui.height, 0, 0, "server was closed")
             case "game.new":
                 self.maze_widget.show()
+                self.maze_widget.solution = None
+                self.maze_widget.winner_name = None
+                self.maze_widget.winner_color = None
                 self.maze = utils.load_from_dict(MazeData, data["maze"])
                 self.players.clear()
                 self.maze_widget.set_maze(self.maze)
                 self.maze_widget.set_players(self.players)
+            case "game.winner":
+                self.maze_widget.winner_name = self.players[data["id"]].client.name
+                self.maze_widget.winner_color = self.players[data["id"]].client.color
             case "game.sync_info":
                 self.maze_widget.show()
                 self.maze = utils.load_from_dict(MazeData, data["maze"])
@@ -81,6 +87,8 @@ class ClientSession:
                 self.maze_widget.set_players(self.players)
             case "game.end":
                 self.maze_widget.hide()
+            case "game.show_solution":
+                self.maze_widget.show_solution()
             case "game.new_player":
                 self.players[data["id"]] = Player(self.clients[data["id"]], data["x"], data["y"])
             case "game.remove_player":

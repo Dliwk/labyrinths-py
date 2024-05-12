@@ -15,4 +15,3 @@ class Player:
     client: ClientInfo
     x: int
     y: int
-

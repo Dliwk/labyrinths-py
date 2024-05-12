@@ -29,7 +29,7 @@ class ClientToHostConnection(Connection):
 
     @override
     def onerror(self):
-        self.handler('session.closed', {})
+        self.handler("session.closed", {})
 
     @override
     def do_handle_packet(self, ptype: str, data: dict) -> None:

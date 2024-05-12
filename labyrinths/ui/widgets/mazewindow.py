@@ -3,18 +3,12 @@
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable, Tuple
 
 import pygame
 from pygame import draw
 
-# TODO: enable only in singleplayer
-from labyrinths.generators.dfs import DepthFirstSearchGenerator
-from labyrinths.generators.kruskal import KruskalGenerator
 from labyrinths.maze import MazeData, WallKind
-
-# TODO: move these outta here
-from labyrinths.mazeloader import dump_maze, load_maze
 from labyrinths.solver import MazeSolver, Solution
 from labyrinths.ui import Widget
 from labyrinths.ui.widgets.button import Button
@@ -32,14 +26,9 @@ class MazeWidget(Widget):
         self.scale = 1.0
         self.current_maze: MazeData | None = None
         self.maze_real_viewport = (-self.cellsize * 3.0, -self.cellsize * 3.0)
-        # self.solution: Solution | None = None
-        # self.generators = [
-        #     (KruskalGenerator, "Kruskal MST"),
-        #     (DepthFirstSearchGenerator, "DFS"),
-        # ]
-        # self.gen_id = 0
 
         self.player_name_font = pygame.font.Font(None, 18)
+        self.announcement_font = pygame.font.Font(None, 64)
 
         self.on_move_right: Callable[[], None] = lambda: None
         self.on_move_left: Callable[[], None] = lambda: None
@@ -63,20 +52,17 @@ class MazeWidget(Widget):
                   "maze.json.gz"),
             # fmt: on
         )
-        # self.help_widget.hide()
+        self.help_widget.hide()
 
-        # Button(self, 100, 30, 0, self.height - 30, onclick=self.new_maze, text="new maze")
-        # self.next_gen_button = Button(self, 120, 30, 0, self.height - 60, onclick=self.next_gen, text="")
-        # Button(self, 100, 30, self.width - 100, self.height - 30, onclick=self.toggle_solution, text="solution")
         Button(self, 30, 30, self.width - 30, 0, onclick=self.scale_up, text="+")
         Button(self, 30, 30, self.width - 60, 0, onclick=self.scale_down, text="-")
-        # Button(self, 60, 30, self.width - 60, self.height // 2, onclick=self.save_maze, text="save")
-        # Button(self, 60, 30, self.width - 60, self.height // 2 - 30, onclick=self.load_maze, text="load")
         self.help_button = Button(self, 30, 30, 0, 0, onclick=self.toggle_help, text="x")
 
-        # self.next_gen()
-        # self.player_coordinates = (0, 0)
         self.players: dict[int, Player] | None = None
+
+        self.solution: Solution | None = None
+        self.winner_name: str | None = None
+        self.winner_color: Tuple[int, int, int] | None = None
 
     @property
     def cellsize(self) -> int:
@@ -113,6 +99,8 @@ class MazeWidget(Widget):
 
     # def save_maze(self) -> None:
     #     """Save the maze into file."""
+    #     from labyrinths.mazeloader import dump_maze
+    #
     #     assert self.current_maze
     #     dump_maze(self.current_maze, "maze.json.gz")
 
@@ -126,10 +114,10 @@ class MazeWidget(Widget):
     #     else:
     #         self.show_solution()
 
-    # def show_solution(self) -> None:
-    #     """Show solution."""
-    #     assert self.current_maze
-    #     self.solution = MazeSolver(self.current_maze).solve()
+    def show_solution(self) -> None:
+        """Show solution."""
+        assert self.current_maze
+        self.solution = MazeSolver(self.current_maze).solve()
 
     def set_maze(self, maze: MazeData) -> None:
         self.current_maze = maze
@@ -147,13 +135,13 @@ class MazeWidget(Widget):
         x, y = self._get_begin_of_cell(i, j)
         return x + self.cellsize // 2, y + self.cellsize // 2
 
-    # def draw_solution(self):
-    #     """Draw the solution path of the current maze."""
-    #     solution = self.solution
-    #     for (i, j), (ni, nj) in zip(solution.path, solution.path[1:], strict=False):
-    #         x, y = self._get_center_of_cell(i, j)
-    #         nx, ny = self._get_center_of_cell(ni, nj)
-    #         draw.line(self.surface, "red", (x, y), (nx, ny), self.solution_line_width)
+    def draw_solution(self):
+        """Draw the solution path of the current maze."""
+        solution = self.solution
+        for (i, j), (ni, nj) in zip(solution.path, solution.path[1:], strict=False):
+            x, y = self._get_center_of_cell(i, j)
+            nx, ny = self._get_center_of_cell(ni, nj)
+            draw.line(self.surface, "red", (x, y), (nx, ny), self.solution_line_width)
 
     def scale_up(self):
         """Scale up the maze."""
@@ -162,10 +150,6 @@ class MazeWidget(Widget):
     def scale_down(self):
         """Scale down the maze."""
         self.scale_maze(-3)
-
-    # def check_end_game(self):
-    #     if self.player_coordinates == (self.current_maze.columns - 1, self.current_maze.rows - 1):
-    #         self.show_solution()
 
     def on_keydown(self, key: int, event: pygame.Event) -> None:
         match key:
@@ -211,7 +195,7 @@ class MazeWidget(Widget):
         x, y = self.maze_real_viewport
         # xoffset, yoffset = self.width / (2 * self.cellsize), self.height / (2 * self.cellsize)
         self.maze_real_viewport = (x * multiplier + self.width / 2 * (multiplier - 1)), (
-            y * multiplier + self.height / 2 * (multiplier - 1)
+                y * multiplier + self.height / 2 * (multiplier - 1)
         )
 
     def on_mouse_wheel(self, wheel: int) -> None:
@@ -273,9 +257,16 @@ class MazeWidget(Widget):
             xsize, ysize = rendered_text.get_size()
             self.surface.blit(rendered_text, (x - xsize // 2, y - self.cellsize - ysize // 2))
 
+    def draw_winner(self) -> None:
+        rendered_text = self.announcement_font.render(f"{self.winner_name} wins", True, self.winner_color)
+        xsize, ysize = rendered_text.get_size()
+        self.surface.blit(rendered_text, (self.width // 2 - xsize // 2, 100))
+
     def render(self) -> None:
         if self.current_maze is not None:
             self.draw_maze()
+            if self.solution:
+                self.draw_solution()
             self.draw_players()
-        # if self.solution:
-        #     self.draw_solution()
+            if self.winner_name is not None:
+                self.draw_winner()

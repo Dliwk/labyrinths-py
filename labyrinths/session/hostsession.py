@@ -85,3 +85,7 @@ class HostSession:
                 result = self.game.handle_movement(client_id, data["dir"])
                 if result is not None:
                     self.conn_set.broadcast("game.movement", {"id": client_id, "x": result[0], "y": result[1]})
+                if self.game.winner_id is not None and not self.game.ended:
+                    self.game.ended = True
+                    self.conn_set.broadcast("game.winner", {"id": self.game.winner_id})
+                    self.conn_set.broadcast("game.show_solution", {})

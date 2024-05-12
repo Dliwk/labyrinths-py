@@ -25,4 +25,4 @@ class AdminPanel(Container):
         Button(self, width, height, 0, 0, text="new", onclick=self.new_maze)
 
     def new_maze(self) -> None:
-        self.session.admin_command("new_game", {"w": 20, "h": 20})
+        self.session.admin_command("new_game", {"w": 10, "h": 10})

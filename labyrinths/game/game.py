@@ -18,6 +18,7 @@ class Game:
         self.maze: MazeData = gen.generate()
         self.players: dict[int, Player] = {}
         self.winner_id: int | None = None
+        self.ended = False
 
     def handle_movement(self, client_id: int, direction: str) -> Tuple[int, int] | None:
         player = self.players[client_id]
@@ -39,7 +40,7 @@ class Game:
         player.x += dx
         player.y += dy
 
-        if (player.x, player.y) == (self.maze.columns - 1, self.maze.rows - 1):
+        if (player.x, player.y) == (self.maze.columns - 1, self.maze.rows - 1) and self.winner_id is None:
             self.winner_id = client_id
 
         return player.x, player.y
