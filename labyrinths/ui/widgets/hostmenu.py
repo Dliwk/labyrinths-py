@@ -80,6 +80,7 @@ class HostMenu(Container):
 
             connection = ClientToHostConnection("127.0.0.1", port)
             client_session = ClientSession(connection, cont)
+            client_session.name = self.name_input.text
             host_session.admin_ids.append(1)
 
             def run_client() -> None:
