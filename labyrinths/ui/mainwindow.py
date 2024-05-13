@@ -170,7 +170,7 @@ class MainWindow:
     def on_mouse_wheel(self, x: int, y: int, wheel: int) -> None:
         self.widget_action(x, y, lambda this: this.on_mouse_wheel(wheel))
 
-    def run(self) -> None:
+    def run(self, once: bool = False) -> None:
         """Run the event loop."""
 
         clock = pygame.time.Clock()
@@ -203,5 +203,7 @@ class MainWindow:
                         self.on_mouse_wheel(*pos, event.y)
             self.render()
             pygame.display.flip()
+            if once:
+                break
 
             clock.tick(60)
