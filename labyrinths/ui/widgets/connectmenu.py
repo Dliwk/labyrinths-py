@@ -19,12 +19,12 @@ class ConnectMenu(Container):
     """Connect Menu."""
 
     def __init__(
-            self,
-            parent: Widget,
-            width: int,
-            height: int,
-            x: int,
-            y: int,
+        self,
+        parent: Widget,
+        width: int,
+        height: int,
+        x: int,
+        y: int,
     ) -> None:
         super().__init__(parent, width, height, x, y)
         TextLabel(
