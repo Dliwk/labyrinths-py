@@ -1,18 +1,20 @@
 """Maze widget"""
 
-import random
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Callable, Tuple
 
 import pygame
 from pygame import draw
 
-from labyrinths.generators.dfs import DepthFirstSearchGenerator
-from labyrinths.generators.kruskal import KruskalGenerator
 from labyrinths.maze import MazeData, WallKind
-from labyrinths.mazeloader import dump_maze, load_maze
 from labyrinths.solver import MazeSolver, Solution
 from labyrinths.ui import Widget
 from labyrinths.ui.widgets.button import Button
 from labyrinths.ui.widgets.label import TextLabel
+
+if TYPE_CHECKING:
+    from labyrinths.session.types import Player
 
 
 class MazeWidget(Widget):
@@ -21,15 +23,16 @@ class MazeWidget(Widget):
     def __init__(self, parent: Widget, width: int, height: int, x: int, y: int) -> None:
         super().__init__(parent, width, height, x, y)
         self.scale = 1.0
-
         self.current_maze: MazeData | None = None
         self.maze_real_viewport = (-self.cellsize * 3.0, -self.cellsize * 3.0)
-        self.solution: Solution | None = None
-        self.generators = [
-            (KruskalGenerator, "Kruskal MST"),
-            (DepthFirstSearchGenerator, "DFS"),
-        ]
-        self.gen_id = 0
+
+        self.player_name_font = pygame.font.Font(None, 18)
+        self.announcement_font = pygame.font.Font(None, 64)
+
+        self.on_move_right: Callable[[], None] = lambda: None
+        self.on_move_left: Callable[[], None] = lambda: None
+        self.on_move_up: Callable[[], None] = lambda: None
+        self.on_move_down: Callable[[], None] = lambda: None
 
         self.mouse_pressed = False
 
@@ -48,20 +51,17 @@ class MazeWidget(Widget):
                   "maze.json.gz"),
             # fmt: on
         )
-        # self.help_widget.hide()
+        self.help_widget.hide()
+        self.help_button = Button(self, 30, 30, 0, 0, onclick=self.toggle_help, text="?")
 
-        Button(self, 100, 30, 0, self.height - 30, onclick=self.new_maze, text="new maze")
-        self.next_gen_button = Button(self, 120, 30, 0, self.height - 60, onclick=self.next_gen, text="")
-        Button(self, 100, 30, self.width - 100, self.height - 30, onclick=self.toggle_solution, text="solution")
         Button(self, 30, 30, self.width - 30, 0, onclick=self.scale_up, text="+")
         Button(self, 30, 30, self.width - 60, 0, onclick=self.scale_down, text="-")
-        Button(self, 60, 30, self.width - 60, self.height // 2, onclick=self.save_maze, text="save")
-        Button(self, 60, 30, self.width - 60, self.height // 2 - 30, onclick=self.load_maze, text="load")
-        self.help_button = Button(self, 30, 30, 0, 0, onclick=self.toggle_help, text="x")
 
-        self.next_gen()
+        self.players: dict[int, Player] = {}
 
-        self.player_coordinates = (0, 0)
+        self.solution: Solution | None = None
+        self.winner_name: str | None = None
+        self.winner_color: Tuple[int, int, int] | None = None
 
     @property
     def cellsize(self) -> int:
@@ -75,12 +75,12 @@ class MazeWidget(Widget):
     def solution_line_width(self) -> int:
         return max(1, int(4 * self.scale))
 
-    def next_gen(self):
-        """Select next generator."""
-        self.gen_id += 1
-        if self.gen_id == len(self.generators):
-            self.gen_id = 0
-        self.next_gen_button.text = self.generators[self.gen_id][1]
+    # def next_gen(self):
+    #     """Select next generator."""
+    #     self.gen_id += 1
+    #     if self.gen_id == len(self.generators):
+    #         self.gen_id = 0
+    #     self.next_gen_button.text = self.generators[self.gen_id][1]
 
     def toggle_help(self):
         """Show/hide help message."""
@@ -91,25 +91,27 @@ class MazeWidget(Widget):
             self.help_widget.hide()
             self.help_button.text = "?"
 
-    def new_maze(self) -> None:
-        """Generate new maze."""
-        gen_class = self.generators[self.gen_id][0]
-        self.set_maze(gen_class(random.randint(10, 60), random.randint(10, 50)).generate())
+    # def new_maze(self) -> None:
+    #     """Generate new maze."""
+    #     gen_class = self.generators[self.gen_id][0]
+    #     self.set_maze(gen_class(random.randint(10, 60), random.randint(10, 50)).generate())
 
-    def save_maze(self) -> None:
-        """Save the maze into file."""
-        assert self.current_maze
-        dump_maze(self.current_maze, "maze.json.gz")
+    # def save_maze(self) -> None:
+    #     """Save the maze into file."""
+    #     from labyrinths.mazeloader import dump_maze
+    #
+    #     assert self.current_maze
+    #     dump_maze(self.current_maze, "maze.json.gz")
 
-    def load_maze(self) -> None:
-        self.set_maze(load_maze("maze.json.gz"))
+    # def load_maze(self) -> None:
+    #     self.set_maze(load_maze("maze.json.gz"))
 
-    def toggle_solution(self) -> None:
-        """Show/hide solution."""
-        if self.solution is not None:
-            self.solution = None
-        else:
-            self.show_solution()
+    # def toggle_solution(self) -> None:
+    #     """Show/hide solution."""
+    #     if self.solution is not None:
+    #         self.solution = None
+    #     else:
+    #         self.show_solution()
 
     def show_solution(self) -> None:
         """Show solution."""
@@ -117,9 +119,10 @@ class MazeWidget(Widget):
         self.solution = MazeSolver(self.current_maze).solve()
 
     def set_maze(self, maze: MazeData) -> None:
-        self.player_coordinates = (0, 0)
         self.current_maze = maze
-        self.solution = None
+
+    def set_players(self, player_list: dict[int, Player]) -> None:
+        self.players = player_list
 
     def _get_begin_of_cell(self, i: int, j: int) -> tuple[int, int]:
         return (
@@ -147,40 +150,16 @@ class MazeWidget(Widget):
         """Scale down the maze."""
         self.scale_maze(-3)
 
-    def try_move_player(self, dx: int, dy: int) -> None:
-        """Try to move player at given direction"""
-        x, y = self.player_coordinates
-        assert self.current_maze
-        if self.current_maze.field[x][y].get_wall_at(dx, dy) == WallKind.EMPTY:
-            self.player_coordinates = (x + dx, y + dy)
-            self.check_end_game()
-
-    def check_end_game(self):
-        if self.player_coordinates == (self.current_maze.columns - 1, self.current_maze.rows - 1):
-            self.show_solution()
-
-    def on_keydown(self, key: int) -> None:
+    def on_keydown(self, key: int, event: pygame.Event) -> None:
         match key:
-            case pygame.K_a:
-                self.maze_real_viewport = self.maze_real_viewport[0] - self.cellsize, self.maze_real_viewport[1]
-            case pygame.K_d:
-                self.maze_real_viewport = self.maze_real_viewport[0] + self.cellsize, self.maze_real_viewport[1]
-            case pygame.K_w:
-                self.maze_real_viewport = self.maze_real_viewport[0], self.maze_real_viewport[1] - self.cellsize
-            case pygame.K_s:
-                self.maze_real_viewport = self.maze_real_viewport[0], self.maze_real_viewport[1] + self.cellsize
-            case pygame.K_o:
-                self.scale_up()
-            case pygame.K_p:
-                self.scale_down()
             case pygame.K_UP:
-                self.try_move_player(0, -1)
+                self.on_move_up()
             case pygame.K_LEFT:
-                self.try_move_player(-1, 0)
+                self.on_move_left()
             case pygame.K_DOWN:
-                self.try_move_player(0, 1)
+                self.on_move_down()
             case pygame.K_RIGHT:
-                self.try_move_player(1, 0)
+                self.on_move_right()
 
     def on_mouse_left_button_down(self) -> None:
         self.mouse_pressed = True
@@ -252,16 +231,30 @@ class MazeWidget(Widget):
                         0,
                     )
 
-    def draw_player(self) -> None:
-        draw.circle(
-            self.surface,
-            "green",
-            self._get_center_of_cell(*self.player_coordinates),
-            (self.cellsize - self.wallwidth) // 2,
-        )
+    def draw_players(self) -> None:
+        for player in self.players.values():
+            x, y = self._get_center_of_cell(player.x, player.y)
+            draw.circle(
+                self.surface,
+                player.client.color,
+                (x, y),
+                (self.cellsize - self.wallwidth) // 2,
+            )
+            rendered_text = self.player_name_font.render(player.client.name, True, player.client.color)
+            xsize, ysize = rendered_text.get_size()
+            self.surface.blit(rendered_text, (x - xsize // 2, y - self.cellsize - ysize // 2))
+
+    def draw_winner(self) -> None:
+        assert self.winner_color is not None
+        rendered_text = self.announcement_font.render(f"{self.winner_name} wins", True, self.winner_color)
+        xsize, ysize = rendered_text.get_size()
+        self.surface.blit(rendered_text, (self.width // 2 - xsize // 2, 100))
 
     def render(self) -> None:
-        self.draw_maze()
-        if self.solution:
-            self.draw_solution()
-        self.draw_player()
+        if self.current_maze is not None:
+            self.draw_maze()
+            if self.solution:
+                self.draw_solution()
+            self.draw_players()
+            if self.winner_name is not None:
+                self.draw_winner()

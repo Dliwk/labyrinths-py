@@ -23,11 +23,11 @@ def test_keydown(mocker, pygame_headless) -> None:
     spy2 = mocker.spy(widget2, "on_keydown")
     spy3 = mocker.spy(widget3, "on_keydown")
 
-    mainwindow.root_widget.on_keydown_propagate(pygame.K_a)
+    mainwindow.root_widget.on_keydown_propagate(pygame.K_a, pygame.Event(pygame.KEYDOWN))
 
-    spy1.assert_called_once_with(pygame.K_a)
-    spy2.assert_called_once_with(pygame.K_a)
-    spy3.assert_called_once_with(pygame.K_a)
+    spy1.assert_called_once_with(pygame.K_a, pygame.Event(pygame.KEYDOWN))
+    spy2.assert_called_once_with(pygame.K_a, pygame.Event(pygame.KEYDOWN))
+    spy3.assert_called_once_with(pygame.K_a, pygame.Event(pygame.KEYDOWN))
 
 
 def test_keyup(mocker, pygame_headless) -> None:
@@ -74,7 +74,7 @@ def test_mouse_click(mocker, pygame_headless) -> None:
     assert spy.call_count == 2
 
 
-def test_widget_closure(mocker, pygame_headless) -> None:
+def test_widget_closure(pygame_headless) -> None:
     mainwindow = MainWindow(800, 600)
     widget1 = EmptyWidget(mainwindow.root_widget, 30, 40, 10, 20)
     widget2 = EmptyWidget(widget1, 10, 20, 0, 0)

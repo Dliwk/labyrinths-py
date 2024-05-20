@@ -7,14 +7,10 @@ from labyrinths.ui.mainwindow import Widget
 
 
 @pytest.fixture
-def pygame_headless(mocker):
-    def set_mode(size):
-        return pygame.Surface(size)
+def pygame_headless():
+    import os
 
-    mocker.patch("pygame.init")
-    mocker.patch("pygame.font.init")
-    mocker.patch("pygame.font.Font")
-    mocker.patch("pygame.display.set_mode", set_mode)
+    os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 
 class EmptyWidget(Widget):

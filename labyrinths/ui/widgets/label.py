@@ -19,16 +19,19 @@ class TextLabel(Widget):
         text: str = "button",
         color: tuple[int, int, int] = (200, 200, 200),
         text_color: tuple[int, int, int] = (0, 0, 0),
+        transparent: bool = False,
         fontsize: int = 25,
     ) -> None:
         super().__init__(parent, width, height, x, y)
         self.text = text
         self.color = color
         self.text_color = text_color
+        self.transparent = transparent
         self.font = pygame.font.Font(None, fontsize)
 
     def render(self) -> None:
-        draw.rect(self.surface, self.color, pygame.Rect((0, 0, self.width, self.height)))
+        if not self.transparent:
+            draw.rect(self.surface, self.color, pygame.Rect((0, 0, self.width, self.height)))
         lines = self.text.splitlines()
         for i, line in enumerate(reversed(lines)):
             rendered_text = self.font.render(line, True, self.text_color)
